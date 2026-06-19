@@ -1,0 +1,184 @@
+---
+title: "Management API"
+description: "Manage Doofinder search engines, indices, and items programmatically."
+---
+
+The Management API lets you automate everything you can do in the Doofinder Admin Panel — creating search engines, managing the data structure (indices), and pushing, updating, or deleting items.
+
+**Version:** v2
+
+## Base URL
+
+```
+https://{search_zone}-api.doofinder.com
+```
+
+Example: `https://eu1-api.doofinder.com`
+
+## Authentication
+
+Supports both **API Token** and **JWT Bearer** token authentication:
+
+```http
+Authorization: Token ab46030xza33960aac71a10248489b6c26172f07
+```
+
+```http
+Authorization: Bearer <jwt-token>
+```
+
+See the [Authentication guide](/introduction/authentication) for JWT signing details.
+
+---
+
+## Endpoints Overview
+
+<CardGroup cols={2}>
+  <Card title="Search Engines" icon="magnifying-glass-chart" href="#search-engines">
+    CRUD operations on search engine configurations.
+  </Card>
+  <Card title="Indices" icon="database" href="#indices">
+    Manage the data types (indices) within a search engine.
+  </Card>
+  <Card title="Items" icon="box" href="#items">
+    Push, update, delete, and query individual items.
+  </Card>
+  <Card title="Bulk Index Operations" icon="layer-group" href="#bulk-index-operations">
+    Full index replacement via temporary indices for zero-downtime updates.
+  </Card>
+</CardGroup>
+
+---
+
+## Search Engines
+
+A **search engine** is the top-level container for your searchable data. It holds one or more indices and is identified by its `hashid`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/search_engines` | List all search engines |
+| `POST` | `/api/v2/search_engines` | Create a new search engine |
+| `GET` | `/api/v2/search_engines/{hashid}` | Get a specific search engine |
+| `PATCH` | `/api/v2/search_engines/{hashid}` | Update search engine settings |
+| `DELETE` | `/api/v2/search_engines/{hashid}` | Delete a search engine |
+| `POST` | `/api/v2/search_engines/{hashid}/_process` | Trigger reprocessing |
+| `GET` | `/api/v2/search_engines/{hashid}/_process` | Get reprocessing task status |
+
+---
+
+## Indices
+
+An **index** is a named collection of items within a search engine. Most stores have a `product` index; you can also have `page`, `category`, or any custom index name.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/search_engines/{hashid}/indices` | List indices |
+| `POST` | `/api/v2/search_engines/{hashid}/indices` | Create an index |
+| `GET` | `/api/v2/search_engines/{hashid}/indices/{name}` | Get index details |
+| `PATCH` | `/api/v2/search_engines/{hashid}/indices/{name}` | Update index configuration |
+| `DELETE` | `/api/v2/search_engines/{hashid}/indices/{name}` | Delete an index |
+
+---
+
+## Items
+
+**Items** are the individual records in an index (products, pages, etc.). Use these endpoints for real-time, incremental updates.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/search_engines/{hashid}/indices/{name}/items/` | List/scroll items |
+| `POST` | `/api/v2/search_engines/{hashid}/indices/{name}/items/` | Create a single item |
+| `GET` | `/api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}` | Get an item |
+| `PATCH` | `/api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}` | Update an item |
+| `DELETE` | `/api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}` | Delete an item |
+| `GET` | `/api/v2/search_engines/{hashid}/indices/{name}/items/_count` | Count items |
+| `POST` | `/api/v2/search_engines/{hashid}/indices/{name}/items/_mget` | Get multiple items by ID |
+| `POST` | `/api/v2/search_engines/{hashid}/indices/{name}/items/_bulk` | Create items in bulk |
+| `PATCH` | `/api/v2/search_engines/{hashid}/indices/{name}/items/_bulk` | Update items in bulk |
+| `DELETE` | `/api/v2/search_engines/{hashid}/indices/{name}/items/_bulk` | Delete items in bulk |
+
+### Bulk operations
+
+Bulk endpoints accept up to **100 items per request**. For large catalogues, split into batches:
+
+```json
+[
+  { "id": "SKU-001", "title": "Running Shoes", "price": 89.99 },
+  { "id": "SKU-002", "title": "Trail Runners", "price": 119.99 }
+]
+```
+
+<Warning>
+  Requests with more than 100 items will be rejected with `422 Unprocessable Entity`. Always batch your payloads.
+</Warning>
+
+---
+
+## Bulk Index Operations
+
+For **full catalogue replacement** (e.g. nightly sync), use the temporary index workflow. This pattern allows a complete index swap with zero search downtime:
+
+<Steps>
+  <Step title="Create a temporary index">
+    `POST /api/v2/search_engines/{hashid}/indices/{name}/temp/`
+
+    Creates a writable temporary index alongside the live one.
+  </Step>
+  <Step title="Push all items to the temporary index">
+    Use the temp item endpoints (`/temp/items/`, `/temp/items/_bulk`) to write your full catalogue.
+    These writes don't affect the live search index.
+  </Step>
+  <Step title="Replace the live index">
+    `POST /api/v2/search_engines/{hashid}/indices/{name}/_replace_by_temp/`
+
+    Atomically swaps the live index with the temporary one. Users continue searching against the old index until the swap completes.
+  </Step>
+</Steps>
+
+Alternatively, use the **reindex** workflow for more control:
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `.../{name}/temp/` | Create temporary index |
+| `DELETE` | `.../{name}/temp/` | Delete temporary index |
+| `POST` | `.../{name}/temp/items/` | Add item to temp index |
+| `GET` | `.../{name}/temp/items/{item_id}` | Get item from temp index |
+| `PATCH` | `.../{name}/temp/items/{item_id}` | Update item in temp index |
+| `DELETE` | `.../{name}/temp/items/{item_id}` | Delete item from temp index |
+| `POST` | `.../{name}/temp/items/_bulk` | Create items in bulk in temp index |
+| `PATCH` | `.../{name}/temp/items/_bulk` | Update items in bulk in temp index |
+| `DELETE` | `.../{name}/temp/items/_bulk` | Delete items in bulk in temp index |
+| `POST` | `.../{name}/temp/items/_mget` | Get multiple items by ID from temp index |
+| `POST` | `.../{name}/_reindex_to_temp/` | Start reindex from live to temp |
+| `GET` | `.../{name}/_reindex_to_temp/` | Get reindex task status |
+| `POST` | `.../{name}/_replace_by_temp/` | Swap temp index into production |
+
+---
+
+## API Limits
+
+| Limit | Value |
+|-------|-------|
+| Rate limit | 20 requests/second |
+| Max request body size | 8 MB |
+| Max items per bulk request | 100 |
+
+---
+
+## Item Structure
+
+Items are schema-flexible — you can include any fields your search engine is configured to index. Some fields are commonly expected:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | **Required.** Your item's unique identifier. |
+| `title` | string | Item title (highly recommended for search quality). |
+| `description` | string | Item description. |
+| `url` | string | URL to the item page. |
+| `image_url` | string | URL to the item image. |
+| `price` | number | Item price. |
+| `df_grouping_id` | string | Group variants under a single result. |
+
+<Tip>
+  The fields indexed by your search engine are configured in the Admin Panel under **Configuration → Search Engines → [engine]**. Only configured fields are searchable and facetable.
+</Tip>

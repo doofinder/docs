@@ -1,0 +1,1359 @@
+openapi: 3.0.0
+info:
+  title: Search API
+  contact:
+    name: Doofinder Support
+    url: https://docs.doofinder.com/
+  version: '6.0'
+  description: |
+    # Introduction
+    Search API allows you to perform the search requests you can do on your search
+    engines using the doofinder layer, directly from your code.
+    # Basics
+    ## Endpoint
+    All requests should be done with `https` protocol in our api location.
+    `https://{search_zone}-search.doofinder.com`
+    where `{search_zone}` depends on your location, is the geographic zone your search engine is located at.
+    i.e.: eu1. Also, indicates which host to use in your API calls.
+    ## Authentication
+    The authentication method for search API requires an api key that could be obtained in our
+    [management control panel](https://admin.doofinder.com).
+    You can generate it in your user account -> Api Keys.
+    Example of the generated API Key:
+    `eu1-ab46030xza33960aac71a10248489b6c26172f07`
+    ### API Token
+    You could authenticate with the previous API key in header as a Token. The correct way to authenticate is
+    to send a HTTP Header with the name `Authorization` and the value `Token <API Key>`
+    For example, for the key shown above:
+    `Authorization: Token eu1-ab46030xza33960aac71a10248489b6c26172f07`
+    ## Conventions
+    Along most of the code samples you will find placeholders for some common variable values. They are:
+    - `{hashid}`: The search engine's unique id. i.e.: d8fdeab7fce96a19d3fc7b0ca7a1e98b
+    - `{token}`: Your personal authentication token obtained in the control panel.
+    - `{index}`: The index of the data you're searching at. i.e.: product
+    - `{id}`: Unique identification of a resource. i.e.: 1234 or HVIUYC
+  termsOfService: https://www.doofinder.com/es/terms-and-conditions
+  x-logo:
+    url: https://admin.doofinder.com/images/logo.svg
+    backgroundColor: '#33268C'
+    altText: Doofinder Search Engine
+tags:
+- name: Search
+  description: Search operations.
+- name: Stats
+  description: Stats operations.
+security:
+- api_token: []
+servers:
+- url: https://{search_zone}-search.doofinder.com
+  variables:
+    search_zone:
+      enum:
+      - eu1
+      - us1
+      - ap1
+      default: eu1
+- url: /
+components:
+  securitySchemes:
+    api_token:
+      type: apiKey
+      description: |
+        You can access with an api key created in your Doofinder control panel.
+        You should put a header in the format: Authorization: Token &lt;your token&gt;
+      name: Authorization
+      in: header
+  schemas:
+    session_id:
+      type: string
+      description: Identifier of search session
+      maxLength: 32
+    user_id:
+      type: string
+      description: Identifier of user
+      maxLength: 36
+    id:
+      type: string
+      description: id of the item to be added/removed
+    index:
+      type: string
+      description: Name of the indice the item belongs to. i.e. "product"
+    query:
+      type: string
+      description: The search query that led to this
+    position:
+      description: The position the clicked item have in the search results. The first position should be 1.
+      type: integer
+    resource_id:
+      type: string
+      description: Identifier of the resource that generated the click
+    checkout_sources:
+      type: array
+      description: a list with the javascript apps that can be considered "source" of that checkout
+      items:
+        type: string
+    custom_results_id:
+      description: Identifier of the custom result the search results belongs to.
+      type: string
+    BannerResponse:
+      title: Banner Response
+      description: Banner response for a query search.
+      type: object
+      properties:
+        blank:
+          description: Display the banner link in a new window.
+          type: boolean
+        html_code:
+          description: Html code to be used  as banner instead of an image.
+          type: string
+        id:
+          description: Banner identification.
+          type: integer
+        image:
+          description: Image URL used as banner.
+          type: string
+        link:
+          description: URL to be redirected when click over banner.
+          type: string
+        mobile_image:
+          description: Image URL used as banner for mobile devices.
+          type: string
+    Item:
+      title: Item
+      description: A searchable object. Items are the objects that form the search results.
+      type: object
+      properties:
+        description:
+          type: string
+          description: Item description.
+        dfid:
+          type: string
+          description: Doofinder result doofinder id. It comes in every Doofinder results for every item.
+        id:
+          type: string
+          description: Unique identification of an indexed item.
+        image_url:
+          type: string
+          description: Item image url.
+        title:
+          type: string
+          description: Item title.
+        url:
+          type: string
+          description: Item url.
+      required:
+      - dfid
+      - id
+      - title
+      example:
+        description: The best product description ever
+        dfid: 1234567890abcdef1234567890abcdef@product@1234567890abcdef
+        id: my_id
+        image_url: http://www.example.com/images/alt_product_image.jpg
+        title: My item
+        url: http://www.example.com/alt_product_description.htm
+    RangeFacetResponse:
+      title: Range Facet Response
+      description: |
+        Facet range search response. Used to return the min and max
+        values for the aggregated field.
+      type: object
+      properties:
+        key:
+          description: Name of the aggregated field.
+          type: string
+        range:
+          type: object
+          properties:
+            from:
+              description: Selected start point of the range.
+              type: number
+            max:
+              description: Maximum value of the field.
+              type: number
+            min:
+              description: Minimum value of the field.
+              type: number
+            to:
+              description: Selected end point of the range.
+              type: number
+    SearchResponse:
+      title: Search Response
+      description: |
+        Search response. Some fields can not be included in the request
+        if they have not data.
+      type: object
+      properties:
+        banner:
+          $ref: '#/components/schemas/BannerResponse'
+        count:
+          description: |
+            Total number of items found in the search engine for the searched
+            term.
+          type: integer
+        custom_results_id:
+          type: integer
+          description: |
+            Id of applied custom results. This field will not be included
+            if none of the custom results apply.
+        dynamic_boosting_rule_id:
+          type: integer
+          description: |
+            Id of applied dynamic boosting rule. This field will not be included
+            if none of the dynamic boosting rules apply.
+        facets:
+          description: Information about different groupings that can be made for certain fields in the search results.
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/TermFacetResponse'
+            - $ref: '#/components/schemas/RangeFacetResponse'
+          type: array
+        query_name:
+          type: string
+          description: In order to get the best possible results, Doofinder tries several types of querying. This is the type
+            of the query Doofinder made to obtain these results.
+        results:
+          items:
+            $ref: '#/components/schemas/Item'
+          type: array
+        total:
+          type: integer
+          description: Total number of items that can be fetched.
+      example:
+        custom_results_id: 5
+        facets:
+        - brand:
+            terms:
+              items:
+              - name: Adidas
+                count: 5
+              - name: Nike
+                count: 3
+              selected: []
+        query_name: fuzzy
+        results:
+        - description: The best product description ever
+          dfid: 1234567890abcdef1234567890abcdef@product@1234567890abcdef
+          id: my_id
+          image_url: http://www.example.com/images/alt_product_image.jpg
+          title: My item
+          url: http://www.example.com/alt_product_description.htm
+        total: 1
+    StatsResponse:
+      title: Stats Response
+      description: Response returned over register stat operation.
+      type: object
+      properties:
+        status:
+          description: Result of the stats request. i.e. 'registered'
+          type: string
+      example:
+        status: registered
+    SuggestionsResponse:
+      title: Suggestions Response
+      description: Response returned on suggestions search.
+      type: array
+      items:
+        type: string
+      example:
+      - Sugg
+      - Suggest
+      - Suggestion
+    TermFacetResponse:
+      title: Term Facet Response
+      description: Facet terms search response. Used to aggregate a field by their values.
+      type: object
+      properties:
+        key:
+          description: Name of the aggregated field.
+          type: string
+        terms:
+          type: object
+          description: Facet terms list
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  count:
+                    description: Number of elements
+                    type: integer
+                  name:
+                    description: Name of the term
+                    type: string
+            selected:
+              description: Items that are selected as part of a filter.
+              type: array
+              items:
+                type: object
+                properties:
+                  count:
+                    description: Number of elements
+                    type: integer
+                  name:
+                    description: Name of the term
+                    type: string
+    AddToCartClickRequest:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+        index:
+          $ref: '#/components/schemas/index'
+        title:
+          type: string
+          description: The title that describe the item. Usually, the title of item's page.
+      required:
+      - id
+      - index
+      - title
+    LogCheckoutRequest:
+      type: object
+      properties:
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+        sources:
+          $ref: '#/components/schemas/checkout_sources'
+      required:
+      - session_id
+    ClickStatsRequest:
+      type: object
+      properties:
+        custom_results_id:
+          $ref: '#/components/schemas/custom_results_id'
+        dfid:
+          $ref: '#/components/schemas/Item/properties/dfid'
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+        query:
+          $ref: '#/components/schemas/query'
+        position:
+          $ref: '#/components/schemas/position'
+        resource_id:
+          $ref: '#/components/schemas/resource_id'
+      required:
+      - session_id
+      - dfid
+    ClickBannerRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the banner clicked
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        query:
+          $ref: '#/components/schemas/query'
+      required:
+      - session_id
+      - id
+    InitSessionRequest:
+      type: object
+      properties:
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+      required:
+      - session_id
+    LogRedirectionRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the redirection triggered
+        query:
+          $ref: '#/components/schemas/query'
+        session_id:
+          $ref: '#/components/schemas/session_id'
+      required:
+      - id
+      - session_id
+    ImageSearchRequest:
+      type: object
+      properties:
+        image:
+          type: string
+          format: base64
+          description: Image encoded in base64.
+          example: iVBORw0KGgoAAAANSUhEUgAAAboAAAC7CAYAAAAT...
+      required:
+      - image
+    SearchRequest:
+      type: object
+      description: Search parameters sent as a JSON body. All fields are optional.
+      properties:
+        query:
+          type: string
+          description: The search term. Cannot be longer than 200 characters or 10 words.
+        rpp:
+          type: integer
+          description: Results per page (max 100, rpp * page < 1000).
+        page:
+          type: integer
+          description: Page number of the results to return.
+        indices:
+          type: array
+          items:
+            type: string
+          description: Restrict the search to one or more indices (e.g. ["product", "page"]).
+        filter:
+          type: object
+          description: |
+            Filter parameters for items. Keys are field names, values are lists of terms
+            or range objects (gte, lte, gt, lt).
+          additionalProperties: true
+        exclude:
+          type: object
+          description: Negative filters. Same structure as filter.
+          additionalProperties: true
+        facets:
+          type: array
+          description: Aggregations to compute. Each entry must include a "field" key.
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              size:
+                type: integer
+              type:
+                type: string
+                enum:
+                - term
+                - range
+        filter_execution:
+          type: string
+          enum:
+          - and
+          - or
+          description: Boolean logic applied to filters. Default is "and".
+        sort:
+          type: array
+          description: |
+            Sort criteria. Each entry is a map of field name to direction
+            (e.g. [{"price": "asc"}]).
+          items:
+            type: object
+            additionalProperties:
+              type: string
+        query_name:
+          type: string
+          enum:
+          - match_and
+          - match_or
+          - fuzzy
+          description: Force a specific query type.
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+        stats:
+          type: boolean
+          description: 'Enable/Disable this search in stats reports. Default: true'
+        auto_filters:
+          type: boolean
+          description: 'Enable/Disable auto filters feature. Default: false'
+        custom_results:
+          type: boolean
+          description: 'Enable/Disable custom results feature. Default: true'
+        excluded_results:
+          type: boolean
+          description: 'Enable/Disable excluded items feature. Default: true'
+        grouping:
+          type: boolean
+          description: Enable/Disable grouping of variants as single items.
+        with_variants:
+          type: array
+          items:
+            type: string
+          description: |
+            When grouping is active, include a df_variants array in each hit with
+            the listed fields from each variant document.
+        skip_auto_filters:
+          type: array
+          items:
+            type: string
+          description: Fields to exclude from auto_filters processing.
+        skip_top_facet:
+          type: array
+          items:
+            type: string
+          description: Fields to exclude from top_facet processing.
+        title_facet:
+          type: boolean
+          description: 'Enable/Disable title_facet feature. Default: false'
+        top_facet:
+          type: boolean
+          description: 'Enable/Disable top_facet feature. Default: false'
+    ErrorResponse:
+      type: object
+      description: Standard error response returned on all non-200 outcomes.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message.
+      required:
+      - error
+  parameters:
+    hashid:
+      name: hashid
+      in: path
+      description: Unique id of a search engine.
+      required: true
+      schema:
+        type: string
+    session_id_path:
+      name: session_id
+      in: path
+      description: The current session ID, must be unique for each user.
+      required: true
+      schema:
+        $ref: '#/components/schemas/session_id'
+    session_id_query:
+      name: session_id
+      in: query
+      description: The current session ID, must be unique for each user.
+      schema:
+        $ref: '#/components/schemas/session_id'
+    user_id_query:
+      name: user_id
+      in: query
+      description: Identifies the user, must be unique for each user.
+      schema:
+        $ref: '#/components/schemas/user_id'
+    auto_filters:
+      name: auto_filters
+      in: query
+      description: 'Enable/Disable auto filters feature in search. Default: false'
+      schema:
+        type: boolean
+    custom_results:
+      name: custom_results
+      in: query
+      description: 'Enable/Disable custom_results feature in search. Default: true'
+      schema:
+        type: boolean
+    dfid:
+      name: dfid
+      in: query
+      description: |
+        Doofinder item id. It comes in every Doofinder results for every item.
+        It has the form {hashid}@{index}@{md5id} i.e.
+        6a96504dc173514cab1e0198af92e6e9@product@e19347e1c3ca0c0b97de5fb3b690855a
+      required: true
+      schema:
+        type: string
+    excluded_results:
+      name: excluded_results
+      in: query
+      description: 'Enable/Disable excluded items feature in the search. Default: true'
+      schema:
+        type: boolean
+    exclude:
+      name: exclude
+      in: query
+      description: |
+        Exclusive parameters are negative filters.
+
+        Doofinder expects the exclude parameters grouped like this:
+
+        `exclude: {
+          color: ['blue', 'red'],
+          size: ['M', 'S'],
+          price: {
+              gte: 4.36,
+              lt: 99
+          }
+        }`
+
+        For the range filters it can be used the following:
+
+        - gte: Greater than or equal
+        - lte: Less than or equal
+        - gt: Greater than
+        - lt: Less than
+
+        Writing that down in request parameters language is:
+
+        `exclude[color][]=blue&exclude[color][]=red&exclude[size]=M&exclude[size]=S&exclude[price][gte]=4.36&exclude[price][lt]=99`
+
+        Note that [ and ] characters should be escaped (%5B and %5D) in all exclude cases.
+      schema:
+        type: string
+    exclude_self:
+      name: exclude_self
+      in: query
+      description: 'Exclude the item being searched from the results. Default: true'
+      schema:
+        type: boolean
+    facets:
+      name: facets
+      in: query
+      schema:
+        type: object
+      description: |
+        Aggregates fields values in a facet, you could use a term facet or range facet.
+        Read [facets configuration](https://support.doofinder.com/search/layer-settings/filters-configuration)
+        for more deep info about facets.
+
+        The type of the facet (term or range) will be determined automatically.
+
+        Parameters:
+        * __field__*: That is the field name that you want to aggregate results.
+        * size: The number of results to return in each field. Only applicable to facet terms. Maximum: 50 by default
+        to help maintain the speed of the search function. If you need more, please contact Doofinder support.
+        * type: The facet type. Indicates the type of the facet, one of `term` or `range`.
+          will return an error if the facet type is not correct.
+
+        *required parameter
+
+
+        Example request returning the `brand` term facet and the `best_facet` range facet:
+
+        `facets[0][field]=brand&facets[0][size]=10&facets[1][field]=best_price`.
+    filter:
+      name: filter
+      in: query
+      description: |
+        Filter parameters for items.
+
+        Doofinder expects the filter parameters grouped like this:
+
+        `filter: {
+            color: ['blue', 'red'],
+            size: ['M', 'S'],
+            price: {
+                gte: 4.36,
+                lt: 99
+            }
+        }`
+
+        Range filters can be used as follow:
+
+        - gte: Greater than or equal
+        - lte: Less than or equal
+        - gt: Greater than
+        - lt: Less than
+
+        Writing that down in request parameters language:
+
+        `filter[color][]=blue&filter[color][]=red&filter[size][]=M&filter[size][]=S&filter[price][gte]=4.36&filter[price][lt]=99`
+
+        Note that [ and ] characters should be escaped (%5B and %5D) in all filter cases.
+      schema:
+        type: string
+    filter_execution:
+      name: filter_execution
+      in: query
+      description: |
+        Filters are applied with "and" boolean logic than means that all filters conditions
+        should be met. If you want to apply any of the filters conditions, you can change it to "or".
+      schema:
+        type: string
+        enum:
+        - and
+        - or
+    grouping:
+      name: grouping
+      in: query
+      description: |
+        Enable/Disable the grouping of variants as single items. If not given, it's taken from the
+        configuration set in the admin.
+      schema:
+        type: boolean
+    with_variants:
+      name: with_variants
+      in: query
+      description: |
+        When provided and grouping is active, each hit includes a `df_variants` array containing
+        all documents that share the same `df_grouping_id`, including the root (collapsed)
+        document itself. The value is a list of document field names to include in each variant
+        hit (e.g. `with_variants[]=visual_variant`).
+        If the list is empty or grouping is off, this parameter has no effect.
+      schema:
+        type: array
+        items:
+          type: string
+    indices:
+      name: indices
+      in: query
+      description: |
+        Your search engine is composed by one or many Indices. With the `indices` parameter you can specify to search
+        within one specific Index. If this parameter is not provided, the search will work with all Indices.
+
+        For instance, if you want to search within the "product" Index you should use the following query:
+
+        `indices[]=product`
+
+        In case you want to search within multiple Indices, the query will be:
+
+        `indices[]=product&indices[]=page`
+
+        The order of the values do not affect the results order.
+
+        Note that `[` and `]` characters should be escaped (`%5B` and `%5D`) in all cases.
+      schema:
+        type: array
+        items:
+          type: string
+      example:
+        indices[]: product
+    page:
+      name: page
+      in: query
+      description: page number of the results to return.
+      schema:
+        type: integer
+    query:
+      name: query
+      in: query
+      description: The search term. It must be escaped and it cannot be longer than 200 characters or 10 words.
+      schema:
+        type: string
+    query_name:
+      name: query_name
+      in: query
+      description: |
+        This parameter is used to run a specific query type; normally search service uses the
+        best query for the search being made.
+
+        The possible values for the `query_name` parameter are:
+
+        * `match_and`: Doofinder will return results that contain all the search terms.
+        * `match_or`: Doofinder will return results that contain any of the search terms. Of course, results that contain all the terms are scored better.
+        * `fuzzy`: Doofinder will try to apply some «fuzzy logic» to determine whether a result, even if it’s not an exact match, is «close enough» to the search terms.
+      schema:
+        type: string
+        enum:
+        - match_and
+        - match_or
+        - fuzzy
+    rpp:
+      name: rpp
+      in: query
+      description: |
+        Results per page. how many results per page to return.
+        Limits are rpp <= 100 and rpp * page < 1000.
+      schema:
+        type: integer
+    stats:
+      name: stats
+      in: query
+      description: 'Enable/Disable this search in stats reports. Default: true'
+      schema:
+        type: boolean
+    skip_auto_filters:
+      name: skip_auto_filters
+      in: query
+      description: A list of fields to be skipped from auto_filters feature.
+      schema:
+        type: array
+        items:
+          type: string
+    skip_top_facet:
+      name: skip_top_facet
+      in: query
+      description: A list of fields to be skipped from top_facet feature.
+      schema:
+        type: array
+        items:
+          type: string
+    sort:
+      name: sort
+      in: query
+      description: |
+        Sorted results by certain fields.
+
+        Doofinder expects sort parameters like this:
+
+        `sort: [{"price": "asc"}, {"brand": "desc"}]`
+
+        Writing that down in request parameters language is:
+
+        `sort[0][price]=asc&sort[1][brand]=desc`
+
+        Note that [ and ] characters should be escaped (%5B and %5D) in all filter cases.
+      schema:
+        type: string
+    title:
+      name: title
+      in: query
+      description: The title of the item.
+      required: true
+      schema:
+        type: string
+    title_facet:
+      name: title_facet
+      in: query
+      description: 'Enable/Disable title_facet feature. Default: false'
+      schema:
+        type: boolean
+    top_facet:
+      name: top_facet
+      in: query
+      description: 'Enable/Disable top_facet feature. Default: false'
+      schema:
+        type: boolean
+    fields:
+      name: fields
+      in: query
+      description: |
+        These are the fields we will use in the similar search, to search for products similar to the one defined by dfid.
+      schema:
+        type: array
+        items:
+          type: string
+paths:
+  /6/{hashid}/_search:
+    get:
+      tags:
+      - Search
+      summary: Search query
+      description: Search through indexed items of a search engine.
+      operationId: search_query
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      - $ref: '#/components/parameters/auto_filters'
+      - $ref: '#/components/parameters/custom_results'
+      - $ref: '#/components/parameters/excluded_results'
+      - $ref: '#/components/parameters/exclude'
+      - $ref: '#/components/parameters/facets'
+      - $ref: '#/components/parameters/filter'
+      - $ref: '#/components/parameters/filter_execution'
+      - $ref: '#/components/parameters/grouping'
+      - $ref: '#/components/parameters/with_variants'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/query_name'
+      - $ref: '#/components/parameters/rpp'
+      - $ref: '#/components/parameters/session_id_query'
+      - $ref: '#/components/parameters/user_id_query'
+      - $ref: '#/components/parameters/stats'
+      - $ref: '#/components/parameters/skip_auto_filters'
+      - $ref: '#/components/parameters/skip_top_facet'
+      - $ref: '#/components/parameters/sort'
+      - $ref: '#/components/parameters/title_facet'
+      - $ref: '#/components/parameters/top_facet'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400': &id002
+          description: Bad Request — invalid query parameters (invalid rpp, page, query_name, sort, filter_execution, session_id,
+            or user_id).
+          content:
+            application/json:
+              schema: &id001
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_query:
+                  summary: Bad query value
+                  value:
+                    error: Bad request, bad query
+                invalid_session_id:
+                  summary: session_id too long
+                  value:
+                    error: session_id should have 32 characters or less
+                invalid_rpp:
+                  summary: Invalid rpp
+                  value:
+                    error: Invalid rpp
+        '403': &id003
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
+        '404': &id004
+          description: Not Found — search engine mapping does not exist.
+          content:
+            application/json:
+              schema: *id001
+              example:
+                summary: Mapping not found
+                value:
+                  error: Mapping not found
+    post:
+      tags:
+      - Search
+      summary: Search query (POST)
+      description: |
+        Search through indexed items of a search engine.
+        Identical to the GET variant but accepts parameters as a JSON body,
+        which is useful when query strings would be too long or when sending
+        complex nested structures (filters, facets, sort).
+      operationId: search_query_post
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400': *id002
+        '403': *id003
+        '404': *id004
+  /6/{hashid}/_image_search:
+    post:
+      tags:
+      - Search
+      summary: Image Search
+      description: Search through indexed images of a search engine.
+      operationId: image_search_query
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageSearchRequest'
+      parameters:
+      - $ref: '#/components/parameters/exclude'
+      - $ref: '#/components/parameters/excluded_results'
+      - $ref: '#/components/parameters/facets'
+      - $ref: '#/components/parameters/filter'
+      - $ref: '#/components/parameters/filter_execution'
+      - $ref: '#/components/parameters/hashid'
+      - $ref: '#/components/parameters/rpp'
+      - $ref: '#/components/parameters/session_id_query'
+      - $ref: '#/components/parameters/user_id_query'
+      - $ref: '#/components/parameters/stats'
+      - $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Bad Request — `image` field missing, invalid `rpp`, or image search is not enabled for this search
+            engine.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                missing_image:
+                  summary: image field missing
+                  value:
+                    error: 'Following fields are missing: ["image"]'
+                not_enabled:
+                  summary: Feature not enabled
+                  value:
+                    error: Image Search is not enabled for this search engine
+                invalid_rpp:
+                  summary: Invalid rpp value
+                  value:
+                    error: Invalid rpp
+        '403': *id003
+        '404': *id004
+        '424':
+          description: Failed Dependency — the image embedding service returned an error. Retry the request.
+          content:
+            application/json:
+              schema: *id001
+              example:
+                summary: Image embedding failed
+                value:
+                  error: There was an error obtaining the embeddings, please try again.
+  /6/{hashid}/_suggest:
+    get:
+      tags:
+      - Search
+      summary: Suggestions
+      description: Search through indexed suggestions of a search engine.
+      operationId: suggestion_query
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/session_id_query'
+      - $ref: '#/components/parameters/user_id_query'
+      - $ref: '#/components/parameters/stats'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuggestionsResponse'
+        '400':
+          description: Bad Request — query exceeds 200 characters or 10 words, or session_id/user_id too long.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                invalid_query:
+                  summary: Query too long or too many words
+                  value:
+                    error: '"query" has an invalid value'
+                invalid_session_id:
+                  summary: session_id too long
+                  value:
+                    error: session_id should have 32 characters or less
+        '403': *id003
+        '404':
+          description: Not Found — search engine mapping not found, or the requested index does not exist.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                mapping_not_found:
+                  summary: Mapping not found
+                  value:
+                    error: Mapping not found
+                index_not_found:
+                  summary: Requested index does not exist
+                  value:
+                    error: Index product not found.
+        '429':
+          description: Too Many Requests — suggestions are not enabled for this search engine.
+          content:
+            application/json:
+              schema: *id001
+              example:
+                summary: Suggestions not enabled
+                value:
+                  error: Suggestions not available
+  /6/{hashid}/_visually_similar:
+    get:
+      tags:
+      - Search
+      summary: Visually Similar
+      description: Search for elements visually similar to the given dfid.
+      operationId: visually_similar_query
+      parameters:
+      - $ref: '#/components/parameters/dfid'
+      - $ref: '#/components/parameters/exclude'
+      - $ref: '#/components/parameters/exclude_self'
+      - $ref: '#/components/parameters/excluded_results'
+      - $ref: '#/components/parameters/facets'
+      - $ref: '#/components/parameters/filter'
+      - $ref: '#/components/parameters/filter_execution'
+      - $ref: '#/components/parameters/hashid'
+      - $ref: '#/components/parameters/rpp'
+      - $ref: '#/components/parameters/session_id_query'
+      - $ref: '#/components/parameters/user_id_query'
+      - $ref: '#/components/parameters/stats'
+      - $ref: '#/components/parameters/fields'
+      - $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Bad Request — `dfid` missing, invalid `rpp`, or image search not enabled for this search engine.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                missing_dfid:
+                  summary: dfid missing
+                  value:
+                    error: 'Following fields are missing: ["dfid"]'
+                not_enabled:
+                  summary: Feature not enabled
+                  value:
+                    error: Image Search is not enabled for this search engine
+        '403': *id003
+        '404':
+          description: Not Found — mapping not found, the dfid has no indexed image, or the image index is unavailable.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                mapping_not_found:
+                  summary: Mapping not found
+                  value:
+                    error: Mapping not found
+                image_not_found:
+                  summary: No image indexed for this dfid
+                  value:
+                    error: Image for the given dfid not found
+                image_index_unavailable:
+                  summary: Image index not available
+                  value:
+                    error: Image index is not available
+  /6/{hashid}/stats/cart/{session_id}:
+    put:
+      tags:
+      - Stats
+      summary: Add to cart
+      description: |
+        Registers a click event on the cart.
+      operationId: add_click
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartClickRequest'
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      - $ref: '#/components/parameters/session_id_path'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+        '400':
+          description: Bad Request — missing required cart item fields (id, index, title), session_id exceeds 32 characters,
+            or invalid cart item data.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                missing_fields:
+                  summary: Required cart item fields missing
+                  value:
+                    error: 'Following fields are missing: ["id", "index", "title"]'
+                invalid_session_id:
+                  summary: session_id too long
+                  value:
+                    error: session_id should have 32 characters or less
+                invalid_cart_data:
+                  summary: Invalid cart item data
+                  value:
+                    error: Invalid cart item data
+        '403': *id003
+  /6/{hashid}/stats/checkout:
+    put:
+      deprecated: true
+      tags:
+      - Stats
+      summary: Logs a checkout
+      description: |
+        Logs a checkout event in stats logs. That is the event for when a
+        customer complete a checkout. The info of the items that were in
+        her session when she completes the checkout are logged in the event.
+      operationId: checkout_stats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogCheckoutRequest'
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+        '400':
+          description: Bad Request — session_id exceeds 32 characters, user_id exceeds 36 characters, or other validation
+            failure.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                invalid_session_id:
+                  summary: session_id too long
+                  value:
+                    error: session_id should have 32 characters or less
+                invalid_user_id:
+                  summary: user_id too long
+                  value:
+                    error: invalid_user_id
+                bad_request:
+                  summary: Generic validation failure
+                  value:
+                    error: Bad request
+        '403': *id003
+  /6/{hashid}/stats/click:
+    put:
+      tags:
+      - Stats
+      summary: Click stats
+      description: Save click event on doofinder statistics
+      operationId: click_stats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClickStatsRequest'
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+        '400':
+          description: Bad Request — missing required fields (dfid, session_id), invalid dfid format, dfid belongs to a different
+            search engine, or invalid position.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                missing_fields:
+                  summary: Required fields missing
+                  value:
+                    error: '[dfid, session_id] fields are missing'
+                invalid_dfid:
+                  summary: dfid format is invalid
+                  value:
+                    error: Bad request, dfid is invalid
+                dfid_hashid_mismatch:
+                  summary: dfid belongs to a different search engine
+                  value:
+                    error: Item hashid must be the same as search engine hashid
+                invalid_session_id:
+                  summary: session_id too long
+                  value:
+                    error: session_id should have 32 characters or less
+        '403': *id003
+        '404':
+          description: Not Found — the item referenced by `dfid` does not exist in this search engine.
+          content:
+            application/json:
+              schema: *id001
+              example:
+                summary: Item not found
+                value:
+                  error: Not found
+  /6/{hashid}/stats/image:
+    put:
+      tags:
+      - Stats
+      summary: Logs a banner image click
+      description: Logs a "click on banner image" event in stats logs.
+      operationId: banner_stats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClickBannerRequest'
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+        '400':
+          description: Bad Request — missing required fields (id, session_id) or banner id is not numeric.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                missing_fields:
+                  summary: Required fields missing
+                  value:
+                    error: '[id, session_id] fields are missing'
+                invalid_id:
+                  summary: Banner id is not numeric
+                  value:
+                    error: Invalid redirect id
+        '403': *id003
+  /6/{hashid}/stats/init:
+    put:
+      tags:
+      - Stats
+      summary: Init session
+      description: |
+        Starts a session identified by a session_id. The session is used to
+        "group" events. I.e. it groups user interactions during a session.
+        Like clicking some banner images, or completing a checkout.
+      operationId: init_stats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitSessionRequest'
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+        '400':
+          description: Bad Request — session_id missing or exceeds 32 characters; user_id exceeds 36 characters.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                missing_session_id:
+                  summary: session_id missing
+                  value:
+                    error: '[session_id] fields are missing'
+                invalid_session_id:
+                  summary: session_id too long
+                  value:
+                    error: session_id should have 32 characters or less
+                invalid_user_id:
+                  summary: user_id too long
+                  value:
+                    error: invalid_user_id
+        '403': *id003
+  /6/{hashid}/stats/redirect:
+    put:
+      tags:
+      - Stats
+      summary: Logs a redirection
+      description: Logs a "redirection triggered" event in stats logs.
+      operationId: redirect_stats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogRedirectionRequest'
+      parameters:
+      - $ref: '#/components/parameters/hashid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+        '400':
+          description: Bad Request — missing required fields (session_id, id) or redirect id is not numeric.
+          content:
+            application/json:
+              schema: *id001
+              examples:
+                missing_fields:
+                  summary: Required fields missing
+                  value:
+                    error: '[session_id, id] fields are missing'
+                invalid_id:
+                  summary: Redirect id is not numeric
+                  value:
+                    error: Invalid redirect id
+        '403': *id003

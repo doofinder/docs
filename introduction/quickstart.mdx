@@ -1,0 +1,123 @@
+---
+title: "Quick Start"
+description: "Make your first Doofinder API call in under 5 minutes."
+---
+
+## Prerequisites
+
+1. A [Doofinder account](https://admin.doofinder.com/auth/signup) with at least one search engine configured
+2. An API key — generate one at **Admin Panel → Account → API Keys**
+
+Your API key looks like this: `eu1-ab46030xza33960aac71a10248489b6c26172f07`
+
+The prefix (`eu1`, `us1`, `ap1`) is your **search zone** — you'll need it to construct the correct API hostname.
+
+---
+
+## Step 1 — Find your Search Engine ID (hashid)
+
+Every Doofinder search engine has a unique `hashid`. You can find it in the Admin Panel under **Configuration → Search Engines** — hover over any engine to copy its hashid.
+
+It looks like: `d8fdeab7fce96a19d3fc7b0ca7a1e98b`
+
+---
+
+## Step 2 — Run a search query
+
+<CodeGroup>
+
+```bash cURL
+curl "https://eu1-search.doofinder.com/6/d8fdeab7fce96a19d3fc7b0ca7a1e98b/_search?query=shoes&rpp=5" \
+  -H "Authorization: Token eu1-ab46030xza33960aac71a10248489b6c26172f07"
+```
+
+```python Python
+import requests
+
+ZONE = "eu1"
+HASHID = "d8fdeab7fce96a19d3fc7b0ca7a1e98b"
+API_KEY = "eu1-ab46030xza33960aac71a10248489b6c26172f07"
+
+response = requests.get(
+    f"https://{ZONE}-search.doofinder.com/6/{HASHID}/_search",
+    params={"query": "shoes", "rpp": 5},
+    headers={"Authorization": f"Token {API_KEY}"}
+)
+data = response.json()
+print(f"Found {data['total']} results")
+for item in data["results"]:
+    print(f"  - {item['title']}")
+```
+
+```javascript JavaScript
+const ZONE = "eu1";
+const HASHID = "d8fdeab7fce96a19d3fc7b0ca7a1e98b";
+const API_KEY = "eu1-ab46030xza33960aac71a10248489b6c26172f07";
+
+const response = await fetch(
+  `https://${ZONE}-search.doofinder.com/6/${HASHID}/_search?query=shoes&rpp=5`,
+  { headers: { Authorization: `Token ${API_KEY}` } }
+);
+const data = await response.json();
+console.log(`Found ${data.total} results`);
+data.results.forEach(item => console.log(`  - ${item.title}`));
+```
+
+</CodeGroup>
+
+**Example response:**
+
+```json
+{
+  "count": 142,
+  "total": 142,
+  "results": [
+    {
+      "id": "SKU-001",
+      "dfid": "d8fdeab7fce96a19d3fc7b0ca7a1e98b@product@abc123",
+      "title": "Running Shoes Pro",
+      "description": "Lightweight performance running shoes",
+      "url": "https://shop.example.com/products/running-shoes-pro",
+      "image_url": "https://shop.example.com/images/running-shoes-pro.jpg"
+    }
+  ],
+  "query_name": "match_and"
+}
+```
+
+---
+
+## Step 3 — Log a click event
+
+When a user clicks a result, log it so Doofinder can improve your rankings and stats:
+
+```bash
+curl -X PUT "https://eu1-search.doofinder.com/6/d8fdeab7fce96a19d3fc7b0ca7a1e98b/stats/click" \
+  -H "Authorization: Token eu1-ab46030xza33960aac71a10248489b6c26172f07" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+    "dfid": "d8fdeab7fce96a19d3fc7b0ca7a1e98b@product@abc123",
+    "query": "shoes",
+    "position": 1
+  }'
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search API Reference" icon="magnifying-glass" href="/search-api/overview">
+    Explore filters, facets, sorting, image search, and more.
+  </Card>
+  <Card title="Authentication" icon="key" href="/introduction/authentication">
+    Learn about API tokens, JWT, and zone-specific keys.
+  </Card>
+  <Card title="Management API" icon="gears" href="/management-api/overview">
+    Push items and manage indices programmatically.
+  </Card>
+  <Card title="Error Reference" icon="triangle-exclamation" href="/introduction/errors">
+    Handle errors gracefully in your integration.
+  </Card>
+</CardGroup>

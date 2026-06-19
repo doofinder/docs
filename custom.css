@@ -1,0 +1,228 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Doofinder API Docs — custom theme
+   Mirrors the visual design of support.doofinder.com
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Pluto typeface (Doofinder brand fonts, served from support site) ──────── */
+@font-face {
+  font-family: 'PlutoHeavy';
+  src: url('https://support.doofinder.com/theme/fonts/pluto_heavy.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PlutoBold';
+  src: url('https://support.doofinder.com/theme/fonts/pluto_bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PlutoRegular';
+  src: url('https://support.doofinder.com/theme/fonts/pluto_regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Color tokens ──────────────────────────────────────────────────────────── */
+:root {
+  --df-bg:      #F9F9FB;  /* page background — very light lavender */
+  --df-sidebar: #F1EFFA;  /* sidebar / nav panel */
+  --df-primary: #4842C1;  /* interactive purple-blue */
+  --df-navy:    #1B1851;  /* deep navy — headings & hover */
+  --df-text:    #212529;  /* body text */
+  --df-muted:   #767A7B;  /* secondary / caption text */
+  --df-border:  #E5E2F5;  /* borders & dividers */
+  --df-yellow:  #FFF031;  /* accent — same as logo mark */
+}
+
+/* ── Typography ────────────────────────────────────────────────────────────── */
+/* !important needed: Tailwind preflight sets font-family/color on html & body */
+html, body {
+  font-family: 'Roboto', system-ui, -apple-system, sans-serif !important;
+  color: var(--df-text) !important;
+  background-color: var(--df-bg) !important;
+}
+
+/* !important needed: Tailwind typography plugin overrides heading styles */
+h1, h2, h3 {
+  font-family: 'PlutoBold', 'Roboto', system-ui, sans-serif !important;
+  color: var(--df-navy) !important;
+}
+
+h4, h5, h6 {
+  font-family: 'PlutoBold', 'Roboto', system-ui, sans-serif !important;
+}
+
+/* ── Page & content background ─────────────────────────────────────────────── */
+main,
+[class*='content'],
+[class*='page'] {
+  background-color: var(--df-bg);
+}
+
+/* ── Sidebar / left nav ────────────────────────────────────────────────────── */
+aside,
+[class*='sidebar'],
+[class*='navigation'],
+nav[aria-label] {
+  border-right: 1px solid var(--df-border);
+}
+
+/* ── Top navbar ────────────────────────────────────────────────────────────── */
+header,
+[class*='topbar'],
+[class*='navbar'] {
+  background-color: var(--df-bg);
+  border-bottom: 1px solid var(--df-border);
+}
+
+header {
+  padding-bottom: 1rem;
+}
+
+nav [class*='navbar'] {
+  border-bottom: none;
+}
+
+/* ── Links ─────────────────────────────────────────────────────────────────── */
+/* !important needed: .prose a selector is more specific than bare `a` */
+a {
+  color: var(--df-primary) !important;
+}
+
+li a {
+  color: var(--df-text) !important;
+}
+
+li a:hover {
+  color: var(--df-navy) !important;
+}
+
+div.nav-tabs :not(a[data-active="true"]) {
+  color: var(--df-text) !important;
+}
+
+/* ── Active / selected nav item ────────────────────────────────────────────── */
+[class*='active'] > a,
+[class*='selected'] > a,
+[aria-current='page'] {
+  color: var(--df-primary) !important;
+  font-family: 'PlutoBold', 'Roboto', system-ui, sans-serif;
+}
+
+/* ── Inline code ───────────────────────────────────────────────────────────── */
+:not(pre) > code {
+  background-color: var(--df-sidebar);
+  color: var(--df-navy);
+  border: 1px solid var(--df-border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+/* ── Cards (CallOut / Note / Warning) ──────────────────────────────────────── */
+[class*='callout'],
+[class*='card'] {
+  border-radius: 8px;
+}
+
+/* ── Buttons (primary) ─────────────────────────────────────────────────────── */
+button[class*='primary'],
+a[class*='button'][class*='primary'] {
+  background-color: var(--df-primary);
+  color: #fff;
+  border-radius: 6px;
+}
+
+button[class*='primary']:hover,
+a[class*='button'][class*='primary']:hover {
+  background-color: var(--df-navy);
+}
+
+/* ── Tables ────────────────────────────────────────────────────────────────── */
+thead {
+  background-color: var(--df-sidebar);
+}
+
+thead th {
+  color: var(--df-navy);
+  font-family: 'PlutoBold', 'Roboto', system-ui, sans-serif;
+}
+
+table {
+  border: 1px solid var(--df-border);
+  border-radius: 8px;
+}
+
+/* ── Dark mode ─────────────────────────────────────────────────────────────── */
+/*
+   The framework adds `class="dark"` on <html> when the user toggles dark mode.
+   The @media block catches the OS-level preference when no manual toggle is set.
+   Because every rule above uses var(--df-*), overriding the tokens here is enough
+   — no duplicated selectors needed.
+*/
+html.dark,
+[data-theme='dark'] {
+  --df-bg:      #0F0D2A;  /* very dark navy-purple */
+  --df-sidebar: #16133D;  /* dark sidebar */
+  --df-primary: #7874E8;  /* lighter purple — readable on dark bg */
+  --df-navy:    #CBC8FF;  /* light lavender — headings & hover in dark */
+  --df-text:    #D8D5F0;  /* light lavender body text */
+  --df-muted:   #8E8BA6;  /* muted caption text */
+  --df-border:  #352E78;  /* visible dark border */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not([data-theme='light']) {
+    --df-bg:      #0F0D2A;
+    --df-sidebar: #16133D;
+    --df-primary: #7874E8;
+    --df-navy:    #CBC8FF;
+    --df-text:    #D8D5F0;
+    --df-muted:   #8E8BA6;
+    --df-border:  #352E78;
+  }
+}
+
+.dark\:text-primary-light:is(.dark *) {
+  color: var(--df-text) !important;
+}
+
+#content-area {
+  max-width: 50rem;
+}
+
+.group:hover .dark\:group-hover\:text-primary-light:is(.dark *) {
+  color: var(--df-text);
+}
+
+.sticky .absolute {
+  background-color: var(--df-sidebar);
+}
+
+.dark\:bg-gray-800:is(.dark *) {
+  background-color: var(--df-muted);
+}
+
+/* ── Scrollbar (Webkit) ────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--df-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--df-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--df-primary);
+}

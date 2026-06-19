@@ -1,0 +1,148 @@
+---
+title: "Recommendations API"
+description: "Deliver personalized product recommendations using Doofinder's recommendation engine."
+---
+
+The Recommendations API powers recommendation widgets on your ecommerce site — showing users products they are likely to be interested in based on browsing history, cart contents, current page context, and user identity.
+
+**Version:** v1
+
+## Base URL
+
+```
+https://{search_zone}-recommendations.doofinder.com
+```
+
+Supported zones: `eu1`, `us1`, `ap1`
+
+## Authentication
+
+The Recommendations API does **not** use an `Authorization` header. Instead, the **widget ID** (a UUID configured in the Admin Panel) acts as the access credential and is passed in the URL path.
+
+---
+
+## How It Works
+
+<Steps>
+  <Step title="Create a carousel in Admin Panel">
+    Go to **Recommendations** and click **Add Carousel**. Each carousel has a `widget_id` (UUID) that you use in the API.
+  </Step>
+  <Step title="Call the API on page load">
+    POST to `/api/widget/{widget_id}` with context about the current page and user.
+  </Step>
+  <Step title="Render the results">
+    The response contains a `results` array of product recommendations and currency formatting details.
+  </Step>
+</Steps>
+
+---
+
+## Endpoint
+
+```
+POST https://{zone}-recommendations.doofinder.com/api/widget/{widget_id}
+```
+
+### Request body
+
+```json
+{
+  "current_url": "https://shop.example.com/products/wireless-headphones",
+  "session_id": "b2b89619844f4eb0b5fa19f28a19d679",
+  "user_id": "8c80694b-354c-4533-acd1-e4b8e7d74b7b",
+  "hashid": "de8f052ea612f95b6950d4013dd6ef38",
+  "language": "en",
+  "price_name": "EUR",
+  "cart_items": [
+    { "dfid": "de8f052ea612f95b6950d4013dd6ef38@product@e7b7a6c35b2d4afc94991bfc8100227a" }
+  ],
+  "category_context": []
+}
+```
+
+### Response
+
+```json
+{
+  "title": "You might also like",
+  "currency": {
+    "code": "EUR",
+    "label": "Euro",
+    "format": "%v %s",
+    "symbol": "€",
+    "precision": 2,
+    "decimal": ",",
+    "thousand": "."
+  },
+  "fallback_action": "disabled",
+  "results": [
+    {
+      "id": "SKU-099",
+      "title": "Wireless Earbuds Pro",
+      "price": 79.99,
+      "url": "https://shop.example.com/products/wireless-earbuds-pro"
+    }
+  ]
+}
+```
+
+---
+
+## Request Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `current_url` | **Yes** | The full URL of the page where the widget is rendered. Used to determine product context. |
+| `session_id` | No | 32-char session identifier. Required for **Browsing history** recommendation type. |
+| `user_id` | No | Persistent user UUID. Enables cross-session personalization. |
+| `hashid` | No | Search engine hash ID. Required when the widget is not tied to a specific search engine. |
+| `language` | No | Language code (e.g. `en`, `es`). Filters results to the specified language. |
+| `price_name` | No | Currency code (e.g. `EUR`, `USD`). Formats prices in the response. |
+| `cart_items[]` | No | Array of `{ dfid }` objects representing items currently in the user's cart. |
+| `category_context[]` | No | Category path context for category-aware recommendations. |
+
+---
+
+## Recommendation Types
+
+The widget type configured in the Admin Panel determines what signals drive the recommendations:
+
+| Type | Required fields | Description |
+|------|----------------|-------------|
+| **Similar products** | `current_url` | Products similar to those on the current page |
+| **Browsing history** | `current_url`, `session_id` | Products based on this session's browsing behavior |
+| **Frequently bought together** | `current_url`, `cart_items[]` | Products often purchased with cart items |
+| **Personalized** | `current_url`, `user_id` | Products personalized to the user's history |
+| **Trending** | `current_url` | Currently popular products |
+
+<Note>
+  If the required signals are not provided for a recommendation type, the API falls back to a default strategy (if fallback is enabled for the widget). If no fallback is configured, an empty `results` array is returned.
+</Note>
+
+---
+
+## CORS
+
+If your ecommerce site uses CORS, ensure the domain making the request is in your store's **Allowed Domains** list in the Admin Panel. Requests from unlisted domains return `403 Forbidden Origin`.
+
+---
+
+## Error Responses
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| `400` | `Bad request` | Invalid or missing parameters. `details` field lists field-level errors. |
+| `403` | `Forbidden origin` | Request origin not in allowed domains |
+| `403` | `Forbidden ip` | Client IP is blocklisted |
+| `404` | `Not found` | Widget ID does not exist |
+| `429` | `Too many requests` | Rate limit exceeded |
+
+```json
+{
+  "error": "Bad request",
+  "details": {
+    "current_url": ["is required"],
+    "session_id": ["length must be less than or equal to 32"]
+  }
+}
+```

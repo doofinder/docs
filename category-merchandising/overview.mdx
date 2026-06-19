@@ -1,0 +1,170 @@
+---
+title: "Category Merchandising API"
+description: "Retrieve search results for category listing pages, with URL-pattern-driven filtering and merchandising rules applied."
+---
+
+The Category Merchandising API powers category listing pages (PLPs) on your ecommerce site. It matches the current page URL against patterns you've configured in the Admin Panel, applies the corresponding product filter, and returns a paginated, faceted result set — with your merchandising rules (pinning, boosting, hiding, sort order) already applied.
+
+**Version:** 1.0
+
+## Base URL
+
+```
+https://{zone}-category-merchandising.doofinder.com/api/1
+```
+
+Supported zones: `eu1`, `us1`, `ap1`
+
+## Authentication
+
+```http
+Authorization: Token {your_token}
+```
+
+The token is validated against the account owning the search engine identified by `hashid`. A missing, invalid, or unauthorized token returns `401 Unauthorized`.
+
+---
+
+## How It Works
+
+<Steps>
+  <Step title="Configure URL patterns in Admin Panel">
+    Go to **Category Merchandising → Pages** and create URL patterns for your category pages (e.g. `https://shop.example.com/categories/shoes*`). Assign a product filter to each pattern (e.g. `category = shoes`).
+  </Step>
+  <Step title="Call the API on page load">
+    Send `GET /category_merchandising/{hashid}?url={current_page_url}`. The API matches the URL against your patterns and applies the correct filter automatically.
+  </Step>
+  <Step title="Render the product grid">
+    The response contains a paginated `results` array, `facets` for filter UI, the `base_filter` showing which rule matched, and an optional promotional `banner`.
+  </Step>
+</Steps>
+
+---
+
+## Endpoint
+
+```
+GET https://{zone}-category-merchandising.doofinder.com/api/1/category_merchandising/{hashid}
+```
+
+### Required parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `hashid` | Your search engine ID (path parameter). |
+| `url` | Full URL of the current category page (query parameter). Query string and fragment are stripped before pattern matching. |
+
+### Optional parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `page` | `1` | Page number (1-indexed). |
+| `rpp` | `50` | Results per page. |
+| `currency` | — | ISO 4217 code (e.g. `EUR`). Converts prices using exchange rates from your search engine config. |
+| `sort[N][field]` | category config | Sort criteria. Overrides the sort configured for the category page. |
+| `filter[field][]` | — | Additional filters on top of the URL pattern filter. Conflicting keys are silently ignored. |
+| `exclude[field][]` | — | Exclude items with specific field values. |
+| `results_personalization_dfids[]` | — | `dfid` values of recently-interacted items. Re-ranks results for contextual relevance. |
+
+---
+
+## Example Request
+
+```bash
+curl "https://eu1-category-merchandising.doofinder.com/api/1/category_merchandising/d8fdeab7fce96a19d3fc7b0ca7a1e98b?url=https://shop.example.com/categories/shoes.html&rpp=24&filter[brand][]=Nike" \
+  -H "Authorization: Token ab46030xza33960aac71a10248489b6c26172f07"
+```
+
+## Example Response
+
+```json
+{
+  "results": [
+    {
+      "dfid": "abc1234de@product@a1b2c3",
+      "id": "SKU-001",
+      "title": "Running Shoes Model X",
+      "price": 99.99,
+      "url": "https://shop.example.com/products/sku-001",
+      "image_url": "https://shop.example.com/images/sku-001.jpg"
+    }
+  ],
+  "total": 243,
+  "page": 1,
+  "rpp": 24,
+  "base_filter": [
+    { "field": "category", "values": ["shoes"] }
+  ],
+  "filter": [
+    { "field": "brand", "values": ["Nike"] }
+  ],
+  "facets": {
+    "brand": {
+      "_type": "terms",
+      "buckets": [
+        { "key": "Nike", "doc_count": 42 },
+        { "key": "Adidas", "doc_count": 38 }
+      ]
+    },
+    "price": {
+      "_type": "range",
+      "buckets": [
+        { "stats": { "min": 9.99, "max": 499.99, "avg": 89.5 } }
+      ]
+    }
+  },
+  "banner": {
+    "id": "189523",
+    "image": "https://shop.example.com/banners/shoes-banner.jpg",
+    "mobile_image": "https://shop.example.com/banners/shoes-banner-mobile.jpg",
+    "html_code": null,
+    "link": "https://shop.example.com/sale/shoes",
+    "target_blank": true
+  }
+}
+```
+
+---
+
+## Key Concepts
+
+### URL pattern matching
+
+The API evaluates the provided `url` against all active patterns for the search engine, ordered by **priority** (lowest number = highest priority). The first match determines:
+- The **base filter** applied to all results (e.g. `category = shoes`)
+- The configured **facets** to return
+- The default **sort order**
+
+If no pattern matches, or the matched category page is inactive, the API returns `404 Not Found`.
+
+### Base filter vs. client filter
+
+| | `base_filter` | `filter` |
+|---|---|---|
+| **Source** | Matched URL pattern | Caller-supplied `filter[field][]` params |
+| **Can be overridden?** | No | Yes — add or remove at call time |
+| **Appears in facets?** | No — locked dimension | Yes |
+
+Fields used by `base_filter` are excluded from the `facets` response. This prevents the UI from offering a filter that can't be changed (e.g. showing a "category" facet on a category page).
+
+### Facet types
+
+| Type | Description | Render as |
+|------|-------------|-----------|
+| `terms` | Discrete keyword values with counts | Checkbox list |
+| `range` | Numeric min/max/avg stats | Price slider |
+
+### Banner
+
+If a promotional banner is configured for the matched category in the Admin Panel, it appears in the `banner` field. Use `html_code` when present (takes precedence over `image`); fall back to `image` / `mobile_image` otherwise.
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `400` | `url` parameter is missing |
+| `401` | Authorization header is missing, invalid, or unauthorized |
+| `404` | No active URL pattern matches the provided `url` |
+| `502` | Upstream search engine error |

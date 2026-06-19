@@ -1,55 +1,45 @@
-# Mintlify Starter Kit
+# Doofinder API Reference Docs
 
-Use the starter kit to get your docs deployed and ready to customize.
+Source for the Doofinder developer documentation site — Search API, Management API, Stats API, Recommendations API, and Category Merchandising API.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## Local development
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+Install the [Mintlify CLI](https://www.npmjs.com/package/mint):
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+```bash
+npm i -g mint
+```
+
+Run the preview server from the root of this repo (where `docs.json` lives):
+
+```bash
+mint dev
+```
+
+Open `http://localhost:3000` in your browser.
 
 ## AI-assisted writing
 
-Set up your AI coding tool to work with Mintlify:
+To configure your AI coding tool to understand Mintlify components and conventions:
 
 ```bash
 npx skills add https://mintlify.com/docs
 ```
 
-This command installs Mintlify's documentation skill for your configured AI tools like Claude Code, Cursor, Windsurf, and others. The skill includes component reference, writing standards, and workflow guidance.
+This installs Mintlify's writing skill for Claude Code, Cursor, Windsurf, and similar tools.
 
-See the [AI tools guides](/ai-tools) for tool-specific setup.
+## Publishing
 
-## Development
+Changes merged to the default branch are deployed automatically via the Mintlify GitHub app. Configure it from the [Mintlify dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+## Troubleshooting
 
-```
-npm i -g mint
-```
+- **Preview not starting** — run `mint update` to get the latest CLI version.
+- **Page shows 404** — make sure `docs.json` is present in the directory where you run `mint dev`.
+- **Links broken after a rename** — update both `docs.json` navigation and any `href` references in MDX files.
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
+## Resources
 
-```
-mint dev
-```
-
-View your local preview at `http://localhost:3000`.
-
-## Publishing changes
-
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
 - [Mintlify documentation](https://mintlify.com/docs)
+- [Doofinder Admin Panel](https://admin.doofinder.com)
+- [Doofinder Support](https://support.doofinder.com)

@@ -1,38 +1,16 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "theme": "maple",
+  "name": "Doofinder API Reference",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#4842C1",
+    "light": "#6B5FD0",
+    "dark": "#1B1851"
   },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+  "custom": {
+    "css": "/custom.css"
   },
+  "favicon": "/favicon.ico",
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
@@ -40,33 +18,277 @@
   "navbar": {
     "links": [
       {
+        "label": "Admin Panel",
+        "href": "https://admin.doofinder.com"
+      },
+      {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "https://support.doofinder.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "label": "Get Started Free",
+      "href": "https://admin.doofinder.com/auth/signup"
     }
   },
   "contextual": {
     "options": [
       "copy",
       "view",
-      "chatgpt",
       "claude",
+      "chatgpt",
       "perplexity",
-      "mcp",
       "cursor",
-      "vscode"
+      "vscode",
+      "mcp"
     ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/doofinder",
+      "github": "https://github.com/doofinder",
+      "linkedin": "https://www.linkedin.com/company/doofinder"
     }
+  },
+  "redirects": [
+    { "source": "/api/search/v6", "destination": "/search-api/overview" },
+    { "source": "/api/search/v6/", "destination": "/search-api/overview" },
+    { "source": "/api/search/v5", "destination": "/search-api/overview" },
+    { "source": "/api/search/v5/", "destination": "/search-api/overview" },
+    { "source": "/api/management/v2", "destination": "/management-api/overview" },
+    { "source": "/api/management/v2/", "destination": "/management-api/overview" },
+    { "source": "/api/recommendations", "destination": "/recommendations-api/overview" },
+    { "source": "/api/recommendations/", "destination": "/recommendations-api/overview" },
+    { "source": "/api/category-merchandising", "destination": "/category-merchandising/overview" },
+    { "source": "/api/category-merchandising/", "destination": "/category-merchandising/overview" }
+  ],
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Getting Started",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "index",
+              "introduction/quickstart",
+              "introduction/authentication",
+              "introduction/errors"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Search API",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "search-api/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "openapi": "openapi/search-v6.yaml",
+            "pages": [
+              "GET /6/{hashid}/_search",
+              "POST /6/{hashid}/_search",
+              "GET /6/{hashid}/_suggest",
+              "POST /6/{hashid}/_image_search",
+              "GET /6/{hashid}/_visually_similar"
+            ]
+          },
+          {
+            "group": "Session & Events",
+            "openapi": "openapi/search-v6.yaml",
+            "pages": [
+              "PUT /6/{hashid}/stats/init",
+              "PUT /6/{hashid}/stats/click",
+              "PUT /6/{hashid}/stats/cart/{session_id}",
+              "PUT /6/{hashid}/stats/redirect",
+              "PUT /6/{hashid}/stats/image"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Management API",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "management-api/overview"
+            ]
+          },
+          {
+            "group": "Search Engines",
+            "openapi": "openapi/management-v2.yaml",
+            "pages": [
+              "GET /api/v2/search_engines",
+              "POST /api/v2/search_engines",
+              "GET /api/v2/search_engines/{hashid}",
+              "PATCH /api/v2/search_engines/{hashid}",
+              "DELETE /api/v2/search_engines/{hashid}",
+              "POST /api/v2/search_engines/{hashid}/_process",
+              "GET /api/v2/search_engines/{hashid}/_process"
+            ]
+          },
+          {
+            "group": "Indices",
+            "openapi": "openapi/management-v2.yaml",
+            "pages": [
+              "GET /api/v2/search_engines/{hashid}/indices",
+              "POST /api/v2/search_engines/{hashid}/indices",
+              "GET /api/v2/search_engines/{hashid}/indices/{name}",
+              "PATCH /api/v2/search_engines/{hashid}/indices/{name}",
+              "DELETE /api/v2/search_engines/{hashid}/indices/{name}"
+            ]
+          },
+          {
+            "group": "Items",
+            "openapi": "openapi/management-v2.yaml",
+            "pages": [
+              "GET /api/v2/search_engines/{hashid}/indices/{name}/items/",
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/items/",
+              "GET /api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}",
+              "PATCH /api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}",
+              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}",
+              "GET /api/v2/search_engines/{hashid}/indices/{name}/items/_count",
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/items/_mget",
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/items/_bulk",
+              "PATCH /api/v2/search_engines/{hashid}/indices/{name}/items/_bulk",
+              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/items/_bulk"
+            ]
+          },
+          {
+            "group": "Bulk Index Operations",
+            "openapi": "openapi/management-v2.yaml",
+            "pages": [
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/temp/",
+              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/temp/",
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/temp/items/",
+              "GET /api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}",
+              "PATCH /api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}",
+              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}",
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk",
+              "PATCH /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk",
+              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk",
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_mget",
+              "GET /api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/",
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/",
+              "POST /api/v2/search_engines/{hashid}/indices/{name}/_replace_by_temp/"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Stats API",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "stats-api/overview"
+            ]
+          },
+          {
+            "group": "Usage & Sessions",
+            "openapi": "openapi/stats-v2.yaml",
+            "pages": [
+              "GET /api/v2/stats/inits",
+              "GET /api/v2/stats/inits/locations",
+              "GET /api/v2/stats/inits/users",
+              "GET /api/v2/stats/usage",
+              "GET /api/v2/stats/search_engine_users"
+            ]
+          },
+          {
+            "group": "Searches",
+            "openapi": "openapi/stats-v2.yaml",
+            "pages": [
+              "GET /api/v2/stats/searches",
+              "GET /api/v2/stats/searches/top",
+              "GET /api/v2/stats/searches/popular",
+              "GET /api/v2/stats/searches/locations",
+              "GET /api/v2/stats/results/top"
+            ]
+          },
+          {
+            "group": "Clicks & Interactions",
+            "openapi": "openapi/stats-v2.yaml",
+            "pages": [
+              "GET /api/v2/stats/clicks",
+              "GET /api/v2/stats/clicks/users",
+              "GET /api/v2/stats/clicked_items",
+              "GET /api/v2/stats/clicked_items/searches",
+              "GET /api/v2/stats/clicked_items/position",
+              "GET /api/v2/stats/redirects"
+            ]
+          },
+          {
+            "group": "Conversions & Sales",
+            "openapi": "openapi/stats-v2.yaml",
+            "pages": [
+              "GET /api/v2/stats/checkouts",
+              "GET /api/v2/stats/sales",
+              "POST /api/v2/stats/sales",
+              "GET /api/v2/stats/top-sales",
+              "POST /api/v2/stats/carts"
+            ]
+          },
+          {
+            "group": "Features",
+            "openapi": "openapi/stats-v2.yaml",
+            "pages": [
+              "GET /api/v2/stats/banners",
+              "GET /api/v2/stats/facets",
+              "GET /api/v2/stats/facets_by_day",
+              "GET /api/v2/stats/facets/top",
+              "GET /api/v2/stats/custom-results",
+              "GET /api/v2/stats/recommendations",
+              "GET /api/v2/stats/quizzes",
+              "GET /api/v2/stats/sector/{name}",
+              "POST /api/v2/stats/visit"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Recommendations API",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "recommendations-api/overview"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "openapi/recommendations-v1.yaml",
+            "pages": [
+              "POST /api/widget/{widget_id}"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Category Merchandising API",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "category-merchandising/overview"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "openapi/category-merchandising-v1.yaml",
+            "pages": [
+              "GET /category_merchandising/{hashid}"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }

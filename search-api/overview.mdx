@@ -1,0 +1,190 @@
+---
+title: "Search API"
+description: "Query your Doofinder search engine, get suggestions, run image search, and track user interactions."
+---
+
+The Search API lets you integrate Doofinder's search capabilities directly into your application. It handles full-text search, autocomplete, image-based search, visually similar products, and session-level event tracking.
+
+**Current version:** v6 (recommended)
+
+<Note>
+  Search API v5 is deprecated. If you are still on v5, migrate to v6 — paths changed from `/5/search` to `/6/{hashid}/_search` and the API now includes POST support, image search, and visually similar endpoints.
+</Note>
+
+## Base URL
+
+```
+https://{search_zone}-search.doofinder.com
+```
+
+Replace `{search_zone}` with your zone (`eu1`, `us1`, `ap1`).
+
+## Authentication
+
+The Search API uses zone-prefixed API keys:
+
+```http
+Authorization: Token eu1-ab46030xza33960aac71a10248489b6c26172f07
+```
+
+Generate keys in the [Admin Panel](https://admin.doofinder.com/admin/account/api).
+
+---
+
+## Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Search" icon="magnifying-glass" href="/api-reference/search/search-query">
+    `GET/POST /6/{hashid}/_search` — Full-text search with filters, facets, sorting, and grouping.
+  </Card>
+  <Card title="Suggestions" icon="wand-magic-sparkles" href="/api-reference/search/suggestions">
+    `GET /6/{hashid}/_suggest` — Autocomplete terms as the user types.
+  </Card>
+  <Card title="Image Search" icon="image" href="/api-reference/search/image-search">
+    `POST /6/{hashid}/_image_search` — Search by image (base64-encoded).
+  </Card>
+  <Card title="Visually Similar" icon="clone" href="/api-reference/search/visually-similar">
+    `GET /6/{hashid}/_visually_similar` — Find visually similar products by `dfid`.
+  </Card>
+</CardGroup>
+
+### Session & Event Tracking
+
+Sending session events is required for accurate stats and improved ranking via behavioral signals.
+
+<CardGroup cols={2}>
+  <Card title="Init Session" icon="play" href="/api-reference/stats/init-session">
+    `PUT /6/{hashid}/stats/init` — Start a user session before the first search.
+  </Card>
+  <Card title="Click" icon="arrow-pointer" href="/api-reference/stats/click-stats">
+    `PUT /6/{hashid}/stats/click` — Log when a user clicks a search result.
+  </Card>
+  <Card title="Add to Cart" icon="cart-shopping" href="/api-reference/stats/add-to-cart">
+    `PUT /6/{hashid}/stats/cart/{session_id}` — Log items added to cart.
+  </Card>
+  <Card title="Redirect" icon="arrow-right" href="/api-reference/stats/logs-a-redirection">
+    `PUT /6/{hashid}/stats/redirect` — Log when a user follows a redirect rule.
+  </Card>
+</CardGroup>
+
+---
+
+## Key Concepts
+
+### hashid
+
+Every Doofinder search engine has a unique identifier called `hashid` (32-character hex string). All Search API paths include it:
+
+```
+GET /6/d8fdeab7fce96a19d3fc7b0ca7a1e98b/_search
+```
+
+Find your `hashid` in the Admin Panel under **Configuration → Search Engines** — hover over any engine to copy its hashid.
+
+### Indices
+
+A search engine can have multiple indices (e.g. `product`, `page`, `category`). By default, all indices are searched. Use the `indices[]` parameter to restrict to one or more:
+
+```
+?indices[]=product&indices[]=page
+```
+
+### session_id and user_id
+
+Track user sessions and identities to enable personalization and accurate analytics:
+
+| Field | Max length | Description |
+|-------|-----------|-------------|
+| `session_id` | 32 chars | Unique per browsing session. Generate a new one per visit. |
+| `user_id` | 36 chars | Persistent user identifier (e.g. UUID). Enables cross-session personalization. |
+
+---
+
+## Filters and Facets
+
+### Filter parameters
+
+Narrow results by field values. Term filters accept arrays; range filters use `gte`, `lte`, `gt`, `lt`:
+
+```
+filter[color][]=blue&filter[color][]=red&filter[price][gte]=10&filter[price][lte]=100
+```
+
+URL-encode brackets: `[` → `%5B`, `]` → `%5D`.
+
+For complex filters, use the `POST` variant and send a JSON body:
+
+```json
+{
+  "query": "shoes",
+  "filter": {
+    "color": ["blue", "red"],
+    "price": { "gte": 10, "lte": 100 }
+  }
+}
+```
+
+### Facet aggregations
+
+Request aggregations to power filter UI:
+
+```
+facets[0][field]=brand&facets[0][size]=10&facets[1][field]=price&facets[1][type]=range
+```
+
+The response includes term counts and range min/max for each requested facet.
+
+---
+
+## Multiprice Format
+
+Doofinder supports multiple prices per product (e.g. for different currencies or customer groups). Index your items with price fields named using the convention `price_{name}` (e.g. `price_eur`, `price_usd`, `price_member`).
+
+To filter by a specific price field:
+
+```
+filter[price_eur][gte]=10&filter[price_eur][lte]=100
+```
+
+To sort by a specific price:
+
+```
+sort[0][price_eur]=asc
+```
+
+<Tip>
+  The `price_name` parameter in the Recommendations API body accepts the currency code (e.g. `"EUR"`) to format prices in the response.
+</Tip>
+
+---
+
+## Grouping and Variants
+
+When your catalogue has product variants (e.g. different sizes/colors of the same product), use grouping to collapse them into a single result:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `grouping` | from Admin config | Collapse variants sharing the same `df_grouping_id` |
+| `with_variants[]` | — | When grouping is on, include these fields from each variant |
+
+```json
+{
+  "query": "t-shirt",
+  "grouping": true,
+  "with_variants": ["size", "color", "price"]
+}
+```
+
+---
+
+## Query Types
+
+Doofinder automatically picks the best query strategy, but you can override it with `query_name`:
+
+| Value | Behavior |
+|-------|---------|
+| `match_and` | All terms must appear in results |
+| `match_or` | Any term can appear (higher score if all match) |
+| `fuzzy` | Applies fuzzy matching for typo tolerance |
+
+The response always includes `query_name` so you can see which strategy was used.

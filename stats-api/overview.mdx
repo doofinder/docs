@@ -1,0 +1,150 @@
+---
+title: "Stats API"
+description: "Retrieve analytics and usage data for your Doofinder search engines."
+---
+
+The Stats API provides access to aggregated analytics data for your search engines — search volumes, click-through rates, conversion metrics, facet usage, and more. All data is read-only.
+
+**Version:** v2
+
+## Base URL
+
+```
+https://{search_zone}-api.doofinder.com
+```
+
+Example: `https://eu1-api.doofinder.com`
+
+## Authentication
+
+```http
+Authorization: Token ab46030xza33960aac71a10248489b6c26172f07
+```
+
+JWT authentication is also supported. See the [Authentication guide](/introduction/authentication).
+
+---
+
+## Common Query Parameters
+
+Most endpoints accept these parameters to define the reporting window:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `hashid` | string | **Required.** Your search engine's identifier. |
+| `from` | string | Start date in `YYYY-MM-DD` format. |
+| `to` | string | End date in `YYYY-MM-DD` format. |
+| `tz` | string | Timezone for date aggregations (e.g. `Europe/Madrid`). |
+
+---
+
+## Endpoint Groups
+
+<CardGroup cols={2}>
+  <Card title="Usage & Sessions" icon="users" href="#usage--sessions">
+    Session counts, user activity, geographic breakdowns, and per-engine usage.
+  </Card>
+  <Card title="Searches" icon="magnifying-glass" href="#searches">
+    Search volume, top queries, popular terms, location data.
+  </Card>
+  <Card title="Clicks & Interactions" icon="arrow-pointer" href="#clicks--interactions">
+    Click-through rates, clicked items, position analysis, redirects.
+  </Card>
+  <Card title="Conversions & Sales" icon="bag-shopping" href="#conversions--sales">
+    Checkout and sales data attributed to search sessions.
+  </Card>
+  <Card title="Features" icon="puzzle-piece" href="#features">
+    Banners, facets, custom results, recommendations, quizzes.
+  </Card>
+</CardGroup>
+
+---
+
+## Usage & Sessions
+
+Track how users are engaging with your search engine over time.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/stats/inits` | Total session counts over time |
+| `GET` | `/api/v2/stats/inits/locations` | Sessions broken down by geographic location |
+| `GET` | `/api/v2/stats/inits/users` | Sessions with identified users |
+| `GET` | `/api/v2/stats/usage` | Overall usage metrics |
+| `GET` | `/api/v2/stats/search_engine_users` | Per-engine usage by user |
+
+---
+
+## Searches
+
+Understand what your users are searching for.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/stats/searches` | Search volume over time |
+| `GET` | `/api/v2/stats/searches/top` | Top search queries ranked by volume |
+| `GET` | `/api/v2/stats/searches/popular` | Popular searches (trending) |
+| `GET` | `/api/v2/stats/searches/locations` | Searches broken down by location |
+| `GET` | `/api/v2/stats/results/top` | Most-returned results across searches |
+
+---
+
+## Clicks & Interactions
+
+Measure how users interact with search results.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/stats/clicks` | Click volume over time |
+| `GET` | `/api/v2/stats/clicks/users` | Clicks attributed to identified users |
+| `GET` | `/api/v2/stats/clicked_items` | Items most frequently clicked |
+| `GET` | `/api/v2/stats/clicked_items/searches` | Searches that led to clicks on each item |
+| `GET` | `/api/v2/stats/clicked_items/position` | Average click position per item |
+| `GET` | `/api/v2/stats/redirects` | Redirect rule trigger counts |
+
+---
+
+## Conversions & Sales
+
+Attribute revenue and conversions to search-driven sessions.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/stats/checkouts` | Checkout events initiated from search sessions |
+| `GET` | `/api/v2/stats/sales` | Sales data |
+| `POST` | `/api/v2/stats/sales` | Confirm a sale event |
+| `GET` | `/api/v2/stats/top-sales` | Top-selling items attributed to search |
+| `POST` | `/api/v2/stats/carts` | Process checkout cart data |
+
+---
+
+## Features
+
+Track usage of specific Doofinder features.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v2/stats/banners` | Banner impression and click stats |
+| `GET` | `/api/v2/stats/facets` | Facet usage — which filters users apply |
+| `GET` | `/api/v2/stats/facets_by_day` | Daily facet usage breakdown |
+| `GET` | `/api/v2/stats/facets/top` | Top facet values by usage |
+| `GET` | `/api/v2/stats/custom-results` | Custom result rule usage |
+| `GET` | `/api/v2/stats/recommendations` | Recommendation widget stats |
+| `GET` | `/api/v2/stats/quizzes` | Quiz feature stats |
+| `GET` | `/api/v2/stats/sector/{name}` | Industry-specific benchmark data |
+| `POST` | `/api/v2/stats/visit` | Log a page visit event |
+
+---
+
+## Key Metrics Explained
+
+### Click-Through Rate (CTR)
+
+The ratio of search sessions that result in at least one click. A low CTR on a query suggests results are not relevant.
+
+### Zero Results Rate
+
+The percentage of searches that return no results. Monitor `GET /api/v2/stats/searches` for queries with `total_results: 0`.
+
+### Session Attribution
+
+Doofinder attributes a sale or checkout to a search session if the user clicked a search result and subsequently completed a purchase within the same session window.

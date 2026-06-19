@@ -1,0 +1,149 @@
+---
+title: "Error Reference"
+description: "HTTP error codes and error response formats across all Doofinder APIs."
+---
+
+All Doofinder APIs use standard HTTP status codes. When a request fails, the response body contains a JSON object describing the error.
+
+## Error Response Format
+
+Most errors return a JSON body with an `error` field:
+
+```json
+{
+  "error": "Not found",
+  "resource": "Widget",
+  "resource_id": "cc1e9563-14e4-46f6-bdf3-42bc57083c25"
+}
+```
+
+Validation errors include a `details` object with field-level messages:
+
+```json
+{
+  "error": "Bad request",
+  "details": {
+    "session_id": ["length must be less than or equal to 32"],
+    "current_url": ["is required"]
+  }
+}
+```
+
+---
+
+## HTTP Status Codes
+
+### `400 Bad Request`
+
+The request contains invalid or missing parameters.
+
+**Common causes:**
+- Missing a required query parameter or body field
+- A string parameter exceeds its maximum length (e.g. `session_id` > 32 chars, `query` > 200 chars or > 10 words)
+- An enum value is not one of the allowed options
+
+**Search API example — query too long:**
+```json
+{ "error": "Bad request", "details": { "query": ["is too long (maximum is 200 characters)"] } }
+```
+
+---
+
+### `401 Unauthorized`
+
+The request is missing an `Authorization` header, or the provided API key is invalid.
+
+**Common causes:**
+- No `Authorization` header sent
+- API key has been revoked or does not exist
+- Wrong key format (e.g. missing the zone prefix for the Search API, or including it for the Management API)
+
+---
+
+### `403 Forbidden`
+
+Access was denied even though authentication succeeded.
+
+**Recommendations API specific variants:**
+
+```json
+{ "error": "Forbidden origin" }
+```
+The request `Origin`/`Referer` is not in the store's allowed domains list.
+
+```json
+{ "error": "Forbidden ip" }
+```
+The client IP is on the store's blocklist.
+
+---
+
+### `404 Not Found`
+
+The requested resource does not exist.
+
+**Management API example:**
+```json
+{
+  "error": "Not found",
+  "resource": "SearchEngine",
+  "resource_id": "d8fdeab7fce96a19d3fc7b0ca7a1e98b"
+}
+```
+
+---
+
+### `413 Payload Too Large`
+
+The request body exceeds **8 MB**. This limit applies to all POST/PUT/PATCH requests.
+
+**Resolution:** Split large payloads into smaller batches. For bulk item operations, use batches of up to 100 items per request.
+
+---
+
+### `422 Unprocessable Entity`
+
+The request is well-formed but cannot be processed due to a semantic error.
+
+**Common cause:** Bulk item operations with more than **100 items** per request.
+
+```json
+{ "error": "Unprocessable entity", "details": { "items": ["must have at most 100 items"] } }
+```
+
+---
+
+### `429 Too Many Requests`
+
+You have exceeded the rate limit of **20 requests per second**.
+
+```json
+{ "error": "Too many requests" }
+```
+
+There is no penalty — wait one second before retrying. The limit resets automatically.
+
+**Best practice for bulk operations:** Use the `_bulk` endpoints instead of sending individual item requests in rapid succession.
+
+---
+
+## Rate Limits Summary
+
+| Limit | Value |
+|-------|-------|
+| Requests per second | 20 |
+| Max request body size | 8 MB |
+| Max items per bulk request | 100 |
+| Max `query` length | 200 characters / 10 words |
+| Max `session_id` length | 32 characters |
+| Max `user_id` length | 36 characters |
+
+---
+
+## Retrying Requests
+
+| Status | Retry? | Strategy |
+|--------|--------|----------|
+| `429` | Yes | Wait 1 second, then retry |
+| `500`, `502`, `503` | Yes | Exponential backoff |
+| `400`, `401`, `403`, `404`, `422` | No | Fix the request before retrying |

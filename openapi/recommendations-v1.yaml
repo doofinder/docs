@@ -1,0 +1,352 @@
+openapi: 3.0.0
+info:
+  title: Recommendations API
+  contact:
+    name: Doofinder Support
+    url: 'https://docs.doofinder.com/'
+  version: '1.0.0'
+  description: |
+    # Introduction
+
+    Recommendations API allows you to retrieve personalized product recommendations
+    for your ecommerce website using Doofinder's recommendation engine.
+
+    # Basics
+
+    ## Endpoint
+
+    All requests should be done with `https` protocol in our api location.
+    `https://{search_zone}-recommendations.doofinder.com`
+    where `{search_zone}` depends on your location, is the geographic zone your recommendation engine is located at.
+    i.e.: eu1. Also, indicates which host to use in your API calls.
+
+    ## Conventions
+
+    Along most of the code samples you will find placeholders for some common variable values. They are:
+    - `{widget_id}`: The recommendation widget's unique UUID. i.e.: 123e4567-e89b-12d3-a456-426614174000
+    - `{session_id}`: Session identifier for tracking user behavior. i.e.: b2b89619844f4eb0b5fa19f28a19d679
+    - `{user_id}`: Unique user identifier. i.e.: 8c80694b-354c-4533-acd1-e4b8e7d74b7b
+    - `{hashid}`: The hash identifier for the search engine. i.e.: de8f052ea612f95b6950d4013dd6ef38
+
+    ## Caveats
+
+    ### Session IDs
+
+    Some types of recommendations rely on user data to provide personalized product recommendations.
+    If such data is not provided, the API will use fallback results, if fallback is enabled.
+    If neither user data is provided nor fallback is enabled, then no recommendations will be returned.
+
+    Currently, the **Browsing history** recommendation type is the only one that requires a `session_id` to be included in the request.
+
+    ### CORS
+
+    If CORS is enabled for your ecommerce site, it is important to ensure that the domain from which you make requests is correctly included
+    in the request's `Origin` and/or `Referer` headers. This allows the domain to be validated against the list of allowed domains for your store.
+    Otherwise, a **`403 Forbidden Origin`** will be returned, blocking the request for security reasons.
+
+    ### Blocked IPs
+
+    If the IP address from which the request originates is blacklisted in your store configuration, a **`403 Forbidden IP`**
+    will be returned, blocking the request for security reasons.
+
+  termsOfService: 'https://www.doofinder.com/es/terms-and-conditions'
+  x-logo:
+    url: 'https://admin.doofinder.com/images/logo.svg'
+    backgroundColor: '#33268C'
+    altText: 'Doofinder Recommendations Engine'
+servers:
+  - url: https://{search_zone}-recommendations.doofinder.com
+    variables:
+      search_zone:
+        enum:
+          - eu1
+          - us1
+          - ap1
+        default: eu1
+tags:
+  - name: Recommendations
+    description: Recommendation operations for personalized product suggestions.
+paths:
+  /api/widget/{widget_id}:
+    post:
+      tags: ["Recommendations"]
+      summary: Get widget recommendations
+      description: Retrieves personalized recommendations for a specific widget
+      operationId: getWidgetRecommendations
+      parameters:
+        - name: widget_id
+          in: path
+          required: true
+          description: Unique identifier for the widget
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationRequest'
+      responses:
+        '200':
+          description: Successful response with recommendations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "Our recommendations"
+                  currency:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "EUR"
+                      label:
+                        type: string
+                        example: "Euro"
+                      format:
+                        type: string
+                        example: "%v %s"
+                      symbol:
+                        type: string
+                        example: "€"
+                      precision:
+                        type: integer
+                        example: 2
+                      decimal:
+                        type: string
+                        example: ","
+                      thousand:
+                        type: string
+                        example: "."
+                  fallback_action:
+                    type: string
+                    example: "disabled"
+                  results:
+                    type: array
+                    items:
+                      type: object
+                    description: Array of recommendation items
+        '400':
+          description: Bad Request - Missing required parameters or validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: General error message
+                    example: "Bad request"
+                  details:
+                    type: object
+                    description: Field-specific validation errors
+                    properties:
+                      session_id:
+                        type: array
+                        items:
+                          type: string
+                        example: ["length must be less than or equal to 32"]
+                      user_id:
+                        type: array
+                        items:
+                          type: string
+                        example: ["is required"]
+                      current_url:
+                        type: array
+                        items:
+                          type: string
+                        example: ["is required"]
+                example:
+                  error: "Bad request"
+                  details:
+                    session_id: ["length must be less than or equal to 32"]
+                    user_id: ["is required"]
+                    current_url: ["is required"]
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                      - "Forbidden origin"
+                      - "Forbidden ip"
+                example:
+                  error: "Forbidden origin"
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+                  resource:
+                    type: string
+                    example: "Widget"
+                  resource_id:
+                    type: string
+                    example: "cc1e9563-14e4-46f6-bdf3-42bc57083c25"
+                example:
+                  error: "Not found"
+                  resource: "Widget"
+                  resource_id: "cc1e9563-14e4-46f6-bdf3-42bc57083c25"
+        '429':
+          description: Too Many Requests - Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Too many request"
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+    BadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: General error message
+          example: "Bad request"
+        details:
+          type: object
+          description: Field-specific validation errors
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            session_id: ["length must be less than or equal to 32"]
+            user_id: ["is required"]
+            current_url: ["is required"]
+      required:
+        - error
+    NotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Not found"
+        resource:
+          type: string
+          description: Type of resource that was not found
+          example: "Widget"
+        resource_id:
+          type: string
+          description: ID of the resource that was not found
+          example: "cc1e4567-e89b-12d3-a456-426614174000"
+      required:
+        - error
+    Currency:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Currency code (e.g., EUR, USD)
+        label:
+          type: string
+          description: Human-readable currency name
+        format:
+          type: string
+          description: Format string for displaying currency
+        symbol:
+          type: string
+          description: Currency symbol
+        precision:
+          type: integer
+          description: Number of decimal places
+        decimal:
+          type: string
+          description: Decimal separator
+        thousand:
+          type: string
+          description: Thousands separator
+    RecommendationRequest:
+      type: object
+      required:
+        - current_url
+      properties:
+        session_id:
+          type: string
+          description: Session identifier (optional)
+          example: "b2b89619844f4eb0b5fa19f28a19d679"
+          nullable: true
+        user_id:
+          type: string
+          format: uuid
+          description: User identifier (optional)
+          example: "8c80694b-354c-4533-acd1-e4b8e7d74b7b"
+          nullable: true
+        current_url:
+          type: string
+          format: uri
+          description: Current page URL
+          example: "https://shop.example.com/products/wireless-headphones-pro"
+        language:
+          type: string
+          description: Language code (optional)
+          example: "en"
+        price_name:
+          type: string
+          description: Currency code (optional)
+          example: "EUR"
+        hashid:
+          type: string
+          description: Hash identifier (optional)
+          example: "de8f052ea612f95b6950d4013dd6ef38"
+        cart_items:
+          type: array
+          nullable: true
+          description: A list of items added to the shopping cart for additional context.
+          items:
+            $ref: "#/components/schemas/CartItem"
+        category_context:
+          type: array
+          description: Contextual category information (optional)
+          nullable: true
+          items:
+            type: object
+    RecommendationResponse:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the recommendations section
+        currency:
+          $ref: '#/components/schemas/Currency'
+        fallback_action:
+          type: string
+          description: Fallback action applied
+        results:
+          type: array
+          items:
+            type: object
+          description: Array of recommendation items
+    CartItem:
+      type: object
+      description: A product being added to the shopping cart.
+      properties:
+        dfid:
+          type: string
+          description: Doofinder's unique ID for the item
+      example:
+        dfid: "123e4567e89b12d3a456426614174000@product@e7b7a6c35b2d4afc94991bfc8100227a"

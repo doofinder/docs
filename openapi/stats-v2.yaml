@@ -1,0 +1,2401 @@
+openapi: 3.0.0
+info:
+  title: Doofinder Stats API
+  contact:
+    name: Doofinder Support
+    url: https://docs.doofinder.com/
+  version: '2.0'
+  x-logo:
+    url: https://admin.doofinder.com/images/logo.svg
+    backgroundColor: '#33268C'
+    altText: Doofinder Search Engine
+  description: |
+    # Introduction
+
+    Doofinder Stats API provides statistical information about your search engines.
+
+    # Basics
+
+    ## Endpoint
+
+    All requests should be done via `https` to the right endpoint:
+
+    ```
+    https://{search-zone}-api.doofinder.com
+    ```
+
+    Where `{search-zone}` is the code of the datacenter where your search engines are located.
+
+    For instance:
+
+    ```
+    https://eu1-api.doofinder.com
+    https://us1-api.doofinder.com
+    ```
+
+    ## Authentication
+
+    To authenticate you need a Doofinder API key. If you don't have one you can generate it in the Doofinder Admin by going to your Account and then to API Keys, [here](https://admin.doofinder.com/admin/account/api).
+
+    A valid API key looks like this:
+
+    ```
+    ab46030xza33960aac71a10248489b6c26172f07
+    ```
+
+    ### API Token
+
+    You can authenticate with the previous API key. The correct way to authenticate is to send a HTTP Header with the name `Authorization` and the value `Token {api-key}`.
+
+    I.e.:
+
+    ```
+    Authorization: Token ab46030xza33960aac71a10248489b6c26172f07
+    ```
+
+    ### JWT Token
+
+    If you prefer you can authenticate with a [JSON Web Token](https://jwt.io). The token must be signed with an API management key and there are some claims required in the JWT payload. These claims are:
+
+      * `iat` (issued at): Creation datetime timestamp, i.e. the moment when the JWT was created.
+
+      * `exp` (expiration time): Expiration datetime timestamp, i.e. the moment when the JWT is going to expire and will no longer be valid. The time span between issued and expiration dates must be shorter than a week.
+
+      * `name`: Your user code. It is your unique identifier as doofinder user. You can find this code in your profile page in the Doofinder's administration panel.
+
+    To authenticate using JWT you must send a HTTP header with the name `Authorization` and the value `Bearer {JWT-token}`.
+
+    I.e.:
+
+    ```
+    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCIsImlhdCI6MTUxNjIzOTAyMn0.QX_3HF-T2-vlvzGDbAzZyc1Cd-J9qROSes3bxlgB4uk
+    ```
+
+    ## Conventions
+
+    Along most of the code samples you will find placeholders for some common variable values. They are:
+
+      * `{hashid}`: The search engine's unique id. e.g.: d8fdeab7fce96a19d3fc7b0ca7a1e98b.
+
+      * `{index}`: When storing items, they're always stored under a certain _index_. e.g.: product.
+
+      * `{token}`: Your personal authentication token obtained in the control panel.
+
+    ## Api limits
+
+    ### Requests rate
+
+    The API has a limit of 20 requests per second. If you do more than that, the next requests will get a `429 Too Many Requests` error. There is no penalty associated to that error, but you must wait one second before attempting more requests.
+
+    ### Body size
+
+    The body size for requests with data sending (eg: POST or PUT requests) has a limit of 8MB. If you do a request with a request body bigger than 8 MB, the response will be `413 Payload Too Large`. This is important mostly for batch calls like batch create items.
+
+    # Objects
+
+    ## Search Engines
+
+    A search engine is a collection of indices where data is stored. It has some properties like name, language, and some other configuration options that are shared among all of its indices.
+
+    Each search engine is uniquely identified by its `hashid` which is an auto-generated string.
+
+    Search engines have a _"process"_ operation which takes items from all its data sources and insert them into their indices. This operation has a zero downtime, you can still search into indices while processing.
+  termsOfService: https://www.doofinder.com/en/terms-and-conditions
+tags:
+- name: Stats
+  description: Provides statistical information about your search engines.
+security:
+- api_token: []
+- jwt_token: []
+servers:
+- url: https://{search_zone}-api.doofinder.com
+  variables:
+    search_zone:
+      enum:
+      - eu1
+      - us1
+      - ap1
+      default: eu1
+- url: /
+components:
+  securitySchemes:
+    jwt_token:
+      type: apiKey
+      description: |
+        JWT Bearer token. Sign a JWT with your API key (HS256) and pass it as:
+        Authorization: Bearer <jwt_token>
+      name: Authorization
+      in: header
+    api_token:
+      type: apiKey
+      description: |
+        Doofinder API key. Pass it as:
+        Authorization: Token <api_key>
+      name: Authorization
+      in: header
+  schemas:
+    hashid:
+      type: string
+      description: Unique id of the search engine. In the search engine selector, you will find the hashid information
+      pattern: ^[a-f0-9]{32}$
+    store:
+      type: string
+      description: Identifier of store. In the store setup section, you will find the store ID information.
+      minLength: 1
+      maxLength: 36
+    ip:
+      deprecated: true
+      type: string
+      description: Unique address that identifies a device. Detected automatically by the server.
+    session_id:
+      type: string
+      description: Identifier of search session
+      maxLength: 32
+      nullable: true
+    url:
+      type: string
+      description: Page URI visited by the user
+    user_agent:
+      deprecated: true
+      type: string
+      description: Identifier of device. Detected automatically by the server.
+    referer:
+      deprecated: true
+      type: string
+      description: The referer header value, provides information about the URL from which the current request originated.
+        Detected automatically by the server.
+    user_id:
+      type: string
+      description: Identifier of user
+      maxLength: 36
+    has_init:
+      type: boolean
+      description: Indicates if the sale was made after using a doofinder product or not
+      default: true
+    currency:
+      type: string
+      description: Currency of the checkout.
+      example: EUR
+    checkout_html:
+      type: string
+      description: Base 64-encoded html for the checkout page. It should only contain the cart's products.
+    checkout_json:
+      type: array
+      description: Checkout json array with the cart items basic data.
+      items:
+        type: object
+        properties:
+          id:
+            description: The id field for the indexed item.
+            type: string
+            example: prod_12345
+          quantity:
+            description: How many items of this product are being bought.
+            type: integer
+            example: 2
+          price:
+            description: The price of the product. If passed as a string, it is expected to have a currency. If passed as
+              a number, it will use the search engine's currency.
+            oneOf:
+            - type: string
+            - type: number
+            example: 29.99
+          title:
+            deprecated: true
+            type: string
+        required:
+        - id
+        - quantity
+        - price
+      example:
+      - id: prod_12345
+        quantity: 2
+        price: 29.99
+      - id: prod_67890
+        quantity: 1
+        price: $12.50
+    CartHtmlRegisterRequest:
+      type: object
+      properties:
+        checkout_html:
+          $ref: '#/components/schemas/checkout_html'
+        hashid:
+          $ref: '#/components/schemas/hashid'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        ip:
+          $ref: '#/components/schemas/ip'
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        referer:
+          $ref: '#/components/schemas/referer'
+        url:
+          $ref: '#/components/schemas/url'
+        currency:
+          $ref: '#/components/schemas/currency'
+      required:
+      - hashid
+      - checkout_html
+      - url
+    CartJSONRegisterRequest:
+      type: object
+      properties:
+        checkout_json:
+          $ref: '#/components/schemas/checkout_json'
+        hashid:
+          $ref: '#/components/schemas/hashid'
+        currency:
+          $ref: '#/components/schemas/currency'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        ip:
+          $ref: '#/components/schemas/ip'
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        referer:
+          $ref: '#/components/schemas/referer'
+      required:
+      - hashid
+      - checkout_json
+    SaleRequest:
+      type: object
+      properties:
+        hashid:
+          $ref: '#/components/schemas/hashid'
+        ip:
+          $ref: '#/components/schemas/ip'
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        referer:
+          $ref: '#/components/schemas/referer'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+        has_init:
+          $ref: '#/components/schemas/has_init'
+      required:
+      - hashid
+    StatsResult:
+      title: Stats Result
+      type: object
+      properties:
+        total:
+          description: Sum of all elements retrieved.
+          type: integer
+          example: 1
+        total_count:
+          description: Total sum of all elements count. If element does not have a "count", this has the same value as `total`.
+          type: integer
+          example: 12
+    StatsTimeResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Counters Stats by Time
+        description: Stats counter with timestamp.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  example: 12
+                timestamp:
+                  type: integer
+                  example: 1581120000000
+      example:
+        results:
+        - timestamp: 1581120000000
+          count: 12
+        total: 1
+        total_count: 12
+    StatsBannersResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Banner Stats
+        description: Stats results for banners.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                displays:
+                  type: integer
+                  example: 12
+                clicks:
+                  type: integer
+                  example: 2
+                id:
+                  type: integer
+                  example: 3561
+      example:
+        results:
+        - clicks: 2
+          displays: 12
+          id: 3561
+        total_count: 1
+        total: 1
+    StatsQuizzesResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Quizzes Stats
+        description: Stats results for quizzes.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                launched:
+                  description: The number of quizzes launched
+                  type: integer
+                  example: 12
+                closed:
+                  description: The number of quizzes the user has closed
+                  type: integer
+                  example: 12
+                completed:
+                  description: The number of quizzes that have been successfully completed
+                  type: integer
+                  example: 12
+                with_product_clicked:
+                  description: The number of quizzes that have led to at least one product click
+                  type: integer
+                  example: 2
+                with_product_added_to_cart:
+                  description: The number of quizzes that have led to at least one product being added to the cart
+                  type: integer
+                  example: 2
+                with_answer:
+                  description: The number of quizzes in which the user has answered at least once
+                  type: integer
+                  example: 2
+                average_duration:
+                  description: The average duration of all quizzes
+                  type: number
+                  example: 33.4
+                id:
+                  description: The id of the quiz
+                  type: integer
+                  example: 3561
+      example:
+        results:
+        - launched: 22
+          closed: 10
+          completed: 10
+          with_product_clicked: 1
+          with_product_added_to_cart: 1
+          with_answer: 12
+          average_duration: 33.2
+          id: 3561
+        total_count: 1
+        total: 1
+    StatsFacetsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Facets Stats
+        description: Stats results for facets.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  description: Number of times facet has been used in provided time range
+                facet:
+                  type: string
+                  description: Used facet
+                timestamp:
+                  type: integer
+                  description: Date timestamp in the format of UNIX timestamp or YYYYMMDD.
+      example:
+        results:
+        - count: 12
+          facet: brand
+          timestamp: 1581120000000
+        total: 1
+        total_count: 12
+    StatsFacetsByDayResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Facets by day stats
+        description: Stats results for facets by day.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                timestamp:
+                  type: integer
+                  description: Date timestamp in the format of UNIX timestamp or YYYYMMDD.
+                additionalProperties:
+                  type: integer
+                  description: Facets with stats by day
+      example:
+        results:
+        - timestamp: 1581120000000
+          brand: 12
+        total: 1
+        total_count: 12
+    StatsTopFacetsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Top Facets Stats
+        description: Top Stats results for facets.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  description: Number of times facet has been used in provided time range
+                facet:
+                  type: string
+                  description: Used facet
+                searches:
+                  type: array
+                  description: List of searches and it's count when facet is applied.
+                  items:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                        description: Number of times a search is associated to facet.
+                      query:
+                        type: string
+                        description: search
+                value:
+                  anyOf:
+                  - type: string
+                    description: Facet value used for filtering
+                  - type: object
+                    description: Range used for filtering
+                    properties:
+                      gte:
+                        type: string
+                        description: Start value of range
+                      lte:
+                        type: string
+                        description: End value of range
+      example:
+        results:
+        - count: 10
+          facet: categories
+          searches:
+          - count: 2
+            query: example
+          - count: 1
+            query: example2
+          value: Electronics
+        - count: 7
+          facet: price
+          searches:
+          - count: 2
+            query: example
+          - count: 1
+            query: ''
+          value:
+            gte: '100'
+            lt: '200'
+        total: 2
+        total_count: 17
+    StatsSalesResult:
+      title: Sales Results Stats
+      description: Stats results for Sales.
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              amount:
+                type: number
+                format: float
+                example: 2.0
+              session:
+                type: string
+                example: ed8fb684573cdbb3d511e465c04e2d21
+        total:
+          description: Count of all sales retrieved.
+          type: integer
+          example: 1
+        total_amount:
+          description: Total sum of all sales amount.
+          type: integer
+          example: 12
+      example:
+        results:
+        - amount: 2.2
+          session: 24cb1eccd1cf4a67d071f2deeac75e33
+        - amount: 1.0
+          session: a4eaf92a223c024b7c6680dc807c3f84
+        total: 2
+        total_amount: 3.2
+    TopSalesResult:
+      title: Top Sales Results Stats
+      description: Top Stats results for Sales.
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              avg_price:
+                type: number
+                example: 3000
+              sum_amount:
+                type: integer
+                example: 21
+              dfid:
+                type: string
+                example: 070cdedbb32a134ad74db5ac9cd93b36@product@74446c03dd1ae404c61723db51a6766b
+              title:
+                type: string
+                example: Item Title
+        total:
+          description: Count of all top sales retrieved.
+          type: integer
+          example: 1
+        total_count:
+          description: Count of all top sales retrieved.
+          type: integer
+          example: 12
+      example:
+        results:
+        - avg_price: 500
+          dfid: 070cdedbb32a134ad74db5ac9cd93b36@product@74446c03dd1ae404c61723db51a6766b
+          sum_amount: 30
+          title: coffee capsules
+        - avg_price: 200.25
+          dfid: 070cdedab32a134ad74db5ac9cd93b36@product@744d6c03dd1ae404c61723db51a6766b
+          sum_amount: 20
+          title: pencils
+        total: 2
+        total_count: 2
+    SearchEngineUsageResult:
+      title: Search engine user stats
+      description: Stats for user behaviour for a search engine.
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              visits:
+                type: number
+                example: 3000
+                description: How many visits a store has received
+              inits:
+                type: integer
+                example: 2000
+                description: How many times the layer has been loaded (unique clicks on search bar)
+              searches:
+                type: integer
+                example: 8000
+                description: Total of searches done
+        total:
+          description: Always 0.
+          type: integer
+          example: 0
+        total_count:
+          description: Always 0.
+          type: integer
+          example: 0
+      example:
+        results:
+        - visits: 3000
+          inits: 2000
+          searches: 8000
+        total: 0
+        total_count: 0
+    StatsCustomresultsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Custom Results Stats
+        description: Stats results for Custom results.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                displays:
+                  type: integer
+                  example: 12
+                clicks:
+                  type: integer
+                  example: 2
+                id:
+                  type: integer
+                  example: 3561
+      example:
+        results:
+        - displays: 10
+          clicks: 2
+          id: 3561
+        - displays: 5
+          clicks: 0
+          id: 3220
+        total: 2
+        total_count: 2
+    StatsClickedItemsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Clicks Stats
+        description: Stats results for clicked items.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  example: 12
+                dfid:
+                  type: string
+                  example: abff7f4819f8e532ef11ce6638963b4e@product@567b8f5f423af15818a068235807edc0
+                link:
+                  type: string
+                  example: https://example.com/item1
+                title:
+                  type: string
+                  example: Item Name
+      example:
+        results:
+        - count: 12
+          dfid: abff7f4819f8e532ef11ce6638963b4e@product@567b8f5f423af15818a068235807edc0
+          link: https://example.com/item1
+          title: Item Name
+          source:
+            link: https://example.com/item1
+            title: Item Name
+        total: 1
+        total_count: 12
+    StatsResultSerchesResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Top results searches
+        description: Stats searches from results.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  example: 12
+                brand:
+                  type: string
+                  example: Garnier
+                categories:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - Perfumes
+                  - OtroCategoria
+      example:
+        results:
+        - count: 200
+          categories: Perfumes
+          brand: Garnier
+        total: 1
+        total_count: 200
+    StatsTopSearchesResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Top Searches Stats
+        description: Stats results for top searches.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  example: 12
+                query:
+                  type: string
+                  example: some term
+      example:
+        results:
+        - count: 12
+          query: some term
+        total: 1
+        total_count: 12
+    StatsRedirectsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Redirects Stats
+        description: Stats results for redirections.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  example: 12
+                id:
+                  type: integer
+                  example: 9771
+                link:
+                  type: string
+                  example: https://example.com/redirection
+      example:
+        results:
+        - count: 12
+          id: 9771
+          link: https://example.com/redirection
+        total: 1
+        total_count: 12
+    StatsLocationResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Sessions Geoocation
+        description: Sessions geolocations result.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                  format: float
+                  example: 38.0952
+                longitude:
+                  type: number
+                  format: float
+                  example: -3.636
+      example:
+        results:
+        - latitude: 38.0952
+          longitude: -3.636
+        total: 1
+        total_count: 1
+    StatsSearchesLocationResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Searches Locations
+        description: Searches locations result.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                city:
+                  type: string
+                  example: Madrid
+                continent:
+                  type: string
+                  example: Europe
+                country:
+                  type: string
+                  example: Spain
+                latitude:
+                  type: number
+                  format: float
+                  example: 38.0952
+                longitude:
+                  type: number
+                  format: float
+                  example: -3.636
+                query:
+                  type: string
+                  example: perfume y hombre
+      example:
+        results:
+        - city: Madrid
+          continent: Europe
+          country: Spain
+          latitude: 38.0952
+          longitude: -3.636
+          query: perfume y hombre
+        total: 1
+        total_count: 1
+    StatsClicksUsersResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Clicks Users
+        description: Clicks users result.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                clicks:
+                  type: integer
+                  example: 12170
+                product_clicks:
+                  type: integer
+                  example: 159080
+                users:
+                  type: integer
+                  example: 5876
+      example:
+        results:
+        - clicks: 12170
+          product_clicks: 159080
+          users: 5876
+        total: 1
+        total_count: 1
+    StatsClicksItemsPositionResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Clicks Items Position
+        description: Clicks items position result.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                clicks:
+                  type: integer
+                  example: 12170
+                  description: How many clicks that product had in that position
+                position:
+                  type: integer
+                  example: 10
+                  description: The product's position when clicked
+                product:
+                  type: string
+                  example: 5876
+                  description: The Id of the product
+      example:
+        results:
+        - clicks: 12170
+          product_clicks: 159080
+          sum_product_position: 5876
+        total: 1
+        total_count: 1
+    StatsInitsUsersResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Inits Users
+        description: Inits users result.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                sessions:
+                  type: integer
+                  example: 12170
+                unique_sessions:
+                  type: integer
+                  example: 159080
+                users:
+                  type: integer
+                  example: 5876
+        example:
+          results:
+          - sessions: 12170
+            unique_sessions: 159080
+            users: 5876
+          total: 1
+          total_count: 1
+    StatsRecommendationsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Recommendations Stats
+        description: Stats results for recommendations.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                displays:
+                  type: integer
+                  example: 12
+                clicks:
+                  type: integer
+                  example: 2
+                widget_id:
+                  type: string
+                  example: c2d64f5f-e99c-4ba8-a25a-3feed98ed68d
+      example:
+        results:
+        - clicks: 2
+          displays: 12
+          hashid: 300204d086f5ad7c4c81e625
+          widget_id: c2d64f5f-e99c-4ba8-a25a-3feed98ed68d
+        total_count: 1
+        total: 1
+    StatsRecommendationConversionsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - title: Recommendation Conversions Stats
+        description: Stats results for recommendation conversions.
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                conversions:
+                  type: integer
+                  example: 3
+                widget_id:
+                  type: string
+                  example: c2d64f5f-e99c-4ba8-a25a-3feed98ed68d
+      example: null
+    RegisterResult:
+      title: Stats Response
+      description: Response returned over register stat operation.
+      type: object
+      properties:
+        status:
+          description: Result of the stats request. i.e. 'registered'
+          type: string
+      example:
+        status: registered
+    VisitRegisterRequest:
+      type: object
+      properties:
+        hashid:
+          $ref: '#/components/schemas/hashid'
+        store:
+          $ref: '#/components/schemas/store'
+        ip:
+          $ref: '#/components/schemas/ip'
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        url:
+          $ref: '#/components/schemas/url'
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+        page_type:
+          type: string
+        dfid:
+          type: string
+      required:
+      - store
+    StatsError:
+      type: object
+      description: Standard error wrapper for all Stats API error responses.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code.
+              example: not_authenticated
+            message:
+              type: string
+              description: Human-readable error description.
+              example: Authentication required
+          required:
+          - code
+          - message
+      required:
+      - error
+  parameters:
+    stats_hashid:
+      name: hashid
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+          pattern: ^[a-f0-9]{32}$
+      deprecated: true
+    widget_ids:
+      name: widget_id
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+    stats_hashids:
+      name: hashids
+      in: query
+      description: Unique id of the search engine. It accepts an array of values. If you want to work with all user search
+        engines just don't send this parameter. Arrays parameters must be in the format `param[]=value`.
+      schema:
+        type: array
+        items:
+          type: string
+          pattern: ^[a-f0-9]{32}$
+    hashids_required:
+      name: hashids
+      required: true
+      in: query
+      description: Unique id of the search engine. It accepts an array of values. Arrays parameters must be in the format
+        `param[]=value`.
+      schema:
+        type: array
+        items:
+          type: string
+          pattern: ^[a-f0-9]{32}$
+    account_code:
+      name: account_code
+      in: query
+      description: The account code to filter by.
+      schema:
+        type: string
+    aggregate:
+      name: aggregate
+      in: query
+      description: Flag to indicate when to aggregate all Search Engines stats data.
+      required: false
+      schema:
+        type: boolean
+        default: true
+    from:
+      name: from
+      in: query
+      description: Start date of the period in the format of UNIX timestamp or YYYYMMDD.
+      required: true
+      schema:
+        type: string
+        pattern: ^20\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$|^\d{10}|^\d{13}$
+    to:
+      name: to
+      in: query
+      description: End date of the period in the format of UNIX timestamp or YYYYMMDD.
+      required: true
+      schema:
+        type: string
+        pattern: ^20\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$|^\d{10}$|^\d{13}
+    format:
+      name: format
+      in: query
+      description: Indicates which response format should be used
+      schema:
+        type: string
+        default: json
+        enum:
+        - json
+        - csv
+    tz:
+      name: tz
+      in: query
+      description: |
+        The timezone for the given dates, by default, assumes ETC/UTC.
+        In naming your time zones, you must stick to those indicated in the TZ database name column [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+      schema:
+        type: string
+        default: Etc/UTC
+      example: Europe/Madrid
+    device:
+      name: device
+      in: query
+      description: Filter by kind of device.
+      schema:
+        type: string
+        enum:
+        - desktop
+        - mobile
+    facet:
+      name: facet
+      in: query
+      description: Filter by a facet.
+      schema:
+        type: array
+        items:
+          type: string
+    query_name:
+      name: query_name
+      in: query
+      description: Type of query to filter by. Arrays parameters must be in the format `param[]=value`.
+      schema:
+        type: array
+        items:
+          type: string
+    sector:
+      name: sector
+      in: query
+      description: Filter by the name of sector.
+      schema:
+        type: string
+    metric_name:
+      name: name
+      in: path
+      required: true
+      description: Filter by the name of sector.
+      schema:
+        type: string
+        enum:
+        - click_through_rate
+        - clicks_per_session
+        - conversion_rate
+        - searches_per_session
+        - used_search
+        - abandonment
+    total_hits:
+      name: total_hits
+      in: query
+      description: Filter by the number of search results.
+      schema:
+        type: integer
+    no_results:
+      name: no_results
+      in: query
+      description: Show only searches that exclusively yielded 0 results.
+      schema:
+        type: boolean
+    opportunities:
+      name: opportunities
+      in: query
+      description: Show only searches that exclusively had "fuzzy" or "phonetic_text" as query name.
+      schema:
+        type: boolean
+    exclude:
+      name: exclude
+      in: query
+      description: Exclude filters
+      schema:
+        type: object
+        properties:
+          total_hits:
+            type: integer
+            description: Exclude by the number of search results.
+    indices:
+      name: indices
+      in: query
+      description: |
+        Filter by index name.
+
+        Parameters:
+          * name *: The name of the index to filter
+          * hashid *: The hashid where `name` belongs
+
+        Format:
+          indices[i][name]=value&indices[i][hashid]=hashid.
+      example: indices[1][name]=product1&indices[1][hashid]=hashid1&indices[2][name]=product2&indices[2][hashid]=hashid2
+      schema:
+        type: object
+    query:
+      name: query
+      in: query
+      description: An string used to filter stats by input query.
+      schema:
+        type: string
+    dfid:
+      name: dfid
+      in: query
+      description: Filter by a doofinder item id. You can get this value from the playground.
+      schema:
+        type: string
+    product_type:
+      name: product_type
+      in: query
+      description: Filter by the type of product.
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - search
+          - banner
+          - custom_result
+          - recommendation
+          - quizz
+          - aichat
+  responses:
+    StatsTimeResponse:
+      description: Stats retrieved.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StatsTimeResult'
+    RegisterResponse:
+      description: Response returned over register stat operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterResult'
+    StatsBadRequest:
+      description: Bad Request — invalid or missing query parameters.
+      content:
+        application/json:
+          schema: &id001
+            $ref: '#/components/schemas/StatsError'
+          example:
+            error:
+              code: bad_params
+              message: Bad parameters error
+    StatsUnauthorized:
+      description: Unauthorized — no valid API token provided.
+      content:
+        application/json:
+          schema: *id001
+          example:
+            error:
+              code: not_authenticated
+              message: Authentication required
+    StatsForbidden:
+      description: Forbidden — token is valid but does not have access to this search engine.
+      content:
+        application/json:
+          schema: *id001
+          example:
+            error:
+              code: access_denied
+              message: Access denied
+    StatsNotFound:
+      description: Not Found — the requested search engine or resource does not exist.
+      content:
+        application/json:
+          schema: *id001
+          example:
+            error:
+              code: not_found
+              message: Not found
+    StatsTimeout:
+      description: Request Timeout — the stats backend took too long; retry after a short delay.
+      content:
+        application/json:
+          schema: *id001
+          example:
+            error:
+              code: timeout
+              message: Request timed out
+    StatsTooManyRequests:
+      description: Too Many Requests — rate limit exceeded; back off and retry.
+      content:
+        application/json:
+          schema: *id001
+          example:
+            error:
+              code: too_many_requests
+              message: Too many requests
+paths:
+  /api/v2/stats/sales:
+    get:
+      tags:
+      - Stats
+      summary: Sales
+      description: Gets the total price for sales checkouts in a period, where a session id identifies every sale.
+      operationId: sales
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/aggregate'
+      responses:
+        200:
+          description: Sales retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsSalesResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+    post:
+      tags:
+      - Stats
+      summary: Sale confirm
+      description: Register checkout event.
+      operationId: checkoutSale
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RegisterResponse'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+  /api/v2/stats/top-sales:
+    get:
+      tags:
+      - Stats
+      summary: Get top sales
+      description: Gets the top sold items in a period.
+      operationId: top_sales
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/aggregate'
+      responses:
+        200:
+          description: Top sales retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopSalesResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/usage:
+    get:
+      tags:
+      - Stats
+      summary: Usage
+      description: |
+        Gets the usage of a list of search engines during a period.
+
+        It sums the query and API requests made to the service.
+        Since usage is computed in UTC time, there is no need to specify the
+        timezone in this endpoint.
+      operationId: usage
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/account_code'
+      - $ref: '#/components/parameters/aggregate'
+      - name: type
+        in: query
+        description: Filter usage by the given type, `query_counters` for requests to search API, and `api_counters` for requests
+          to management API. You can also filter by product or obtain everything with `all`. If no type is provided it filters
+          by `search`.
+        schema:
+          type: string
+          enum:
+          - api_counters
+          - query_counters
+          - recommendations_counters
+          - visual_counters
+          - quiz_counters
+          - category_page_counters
+          - search
+          - quizzes
+          - recommendations
+          - assistant_counters
+          - all
+      - $ref: '#/components/parameters/format'
+      responses:
+        200:
+          $ref: '#/components/responses/StatsTimeResponse'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/searches/top:
+    get:
+      tags:
+      - Stats
+      summary: Top searches
+      description: Gets a list of the most common searches in a time period.
+      operationId: searchesTop
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/query_name'
+      - $ref: '#/components/parameters/total_hits'
+      - $ref: '#/components/parameters/no_results'
+      - $ref: '#/components/parameters/opportunities'
+      - $ref: '#/components/parameters/exclude'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsTopSearchesResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/searches/popular:
+    get:
+      tags:
+      - Stats
+      summary: Popular searches
+      description: Gets the most popular searches (the ones containing most clicked items) in a time period.
+      operationId: searchesPopular
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/exclude'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsTopSearchesResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/searches:
+    get:
+      tags:
+      - Stats
+      summary: Searches
+      description: Counts number of searches in a time period grouped by day.
+      operationId: searchesByDate
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/query_name'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      - name: source
+        in: query
+        description: Filter by the search source.
+        schema:
+          type: string
+          enum:
+          - voice
+          - image
+          - visually_similar
+      - $ref: '#/components/parameters/total_hits'
+      - $ref: '#/components/parameters/aggregate'
+      responses:
+        200:
+          $ref: '#/components/responses/StatsTimeResponse'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/redirects:
+    get:
+      tags:
+      - Stats
+      summary: Redirections
+      description: Gets redirections and how many times users make use of them in a time period.
+      operationId: redirects
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - name: id
+        in: query
+        description: Filter by the unique id of a redirection.
+        schema:
+          type: integer
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/query'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsRedirectsResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/inits:
+    get:
+      tags:
+      - Stats
+      summary: Sessions
+      description: Counts number of total unique search sessions in a time period group by day.
+      operationId: initsByDate
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      responses:
+        200:
+          $ref: '#/components/responses/StatsTimeResponse'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/inits/locations:
+    get:
+      tags:
+      - Stats
+      summary: Sessions geolocation
+      description: Gets all sessions geolocation for a time period.
+      operationId: initsLocations
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/aggregate'
+      responses:
+        200:
+          description: Geolocations retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsLocationResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/carts:
+    post:
+      tags:
+      - Stats
+      summary: Checkout cart process
+      description: Process checkout cart information on Doofinder statistics.
+      operationId: registerCart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/CartHtmlRegisterRequest'
+              - $ref: '#/components/schemas/CartJSONRegisterRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RegisterResponse'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+  /api/v2/stats/clicked_items:
+    get:
+      tags:
+      - Stats
+      summary: Clicked items
+      description: Gets the most commonly clicked items in a time period.
+      operationId: clickedItems
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      - name: limit
+        in: query
+        description: Maximum number of items to return with a minimum of 1 item and a maximum of 1000.
+        schema:
+          type: integer
+          default: 100
+          minimum: 1
+          maximum: 1000
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsClickedItemsResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/clicked_items/searches:
+    get:
+      tags:
+      - Stats
+      summary: Clicked item searches
+      description: Gets the most common searched for a clicked item, and how many times it has been clicked from those searches.
+      operationId: clickedItemSearches
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+        required: true
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsTopSearchesResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/clicks:
+    get:
+      tags:
+      - Stats
+      summary: Clicks
+      description: Counts number of clicks in a time period grouped by day.
+      operationId: clicksByDate
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      - $ref: '#/components/parameters/product_type'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsTimeResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/checkouts:
+    get:
+      tags:
+      - Stats
+      summary: Checkouts
+      description: Counts numbers of checkouts in a time period grouped by day.
+      operationId: checkoutsByDate
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsTimeResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/banners:
+    get:
+      tags:
+      - Stats
+      summary: Banners
+      description: Gets how many times banners have been displayed and clicked in a time period, grouped by banner id.
+      operationId: bannersStats
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - name: id
+        in: query
+        description: Unique id of the banner.
+        schema:
+          type: string
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/indices'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsBannersResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/quizzes:
+    get:
+      tags:
+      - Dev
+      summary: Quizzes
+      description: Gets how many times quizzes have been launched, completed, closed, etc, in a time period, grouped by quiz
+        id.
+      operationId: quizzesStats
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsQuizzesResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/facets:
+    get:
+      tags:
+      - Stats
+      summary: Facets
+      description: Gets how many times facets filters have been used in a time period, grouped by facet field.
+      operationId: facetsStats
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/facet'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/query'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsFacetsResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/facets_by_day:
+    get:
+      tags:
+      - Stats
+      summary: Facets by day
+      description: Gets how many times facets filters have been used in a time period, grouped by day.
+      operationId: facetsStatsByDay
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/facet'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/query'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsFacetsResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/facets/top:
+    get:
+      tags:
+      - Stats
+      summary: Top facets values
+      description: Gets most common facets filters used, how many times they have been used and which filter has been applied
+        in a time period.
+      operationId: facetsTopStats
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/device'
+      - $ref: '#/components/parameters/facet'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/query'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsTopFacetsResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/custom-results:
+    get:
+      tags:
+      - Stats
+      summary: Custom results
+      description: Gets how many times custom results have been displayed and clicked in a time period, grouped by custom
+        result id.
+      operationId: customResultsStats
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - name: id
+        in: query
+        description: Unique id of the custom result.
+        schema:
+          type: string
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/indices'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsCustomresultsResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/recommendations:
+    get:
+      tags:
+      - Stats
+      summary: Recommendations
+      description: Gets how many times recommendations have been displayed and clicked in a time period, grouped by recommendation
+        widget id.
+      operationId: getRecommendationWidgetStatsByHashid
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsRecommendationsResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/search_engine_users:
+    get:
+      tags:
+      - Stats
+      summary: Search engine usage
+      description: Gets how many visits a Search engine receive and from that users how many inits & searches in a time period
+      operationId: searchEngineUsersStats
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/format'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/device'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchEngineUsageResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/sector/{name}:
+    get:
+      tags:
+      - Stats
+      summary: Sector
+      description: Retrieve the median of the metric you send for the sector and/or the hashid.
+      operationId: sector
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/stats_hashid'
+      - $ref: '#/components/parameters/sector'
+      - $ref: '#/components/parameters/metric_name'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsTimeResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/inits/users:
+    get:
+      tags:
+      - Stats
+      summary: Inits with users
+      description: Counts numbers of different users in sessions for a time period.
+      operationId: initsByUser
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/device'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsInitsUsersResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/searches/locations:
+    get:
+      tags:
+      - Stats
+      summary: Searches locations
+      description: Gets all searches locations for a time period.
+      operationId: searchesLocations
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/tz'
+      - $ref: '#/components/parameters/aggregate'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      responses:
+        200:
+          description: Locations retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsSearchesLocationResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/clicks/users:
+    get:
+      tags:
+      - Stats
+      summary: Clicks with users
+      description: Counts numbers of different users and products in clicks for a time period.
+      operationId: clicksByUsers
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      - $ref: '#/components/parameters/device'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsClicksUsersResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/clicked_items/position:
+    get:
+      tags:
+      - Stats
+      summary: Clicks items and position
+      description: Gets the number of clicks each clicked product had in a period of time grouped by position.
+      operationId: clicksItemsPosition
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/indices'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      - $ref: '#/components/parameters/device'
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsClicksItemsPositionResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/results/top:
+    get:
+      tags:
+      - Stats
+      summary: Results searches
+      description: Gets the most commonly <metric> obtained in searches during a time period. Where <metric> can be brand
+        or categories.
+      operationId: resultsSearches
+      parameters:
+      - $ref: '#/components/parameters/from'
+      - $ref: '#/components/parameters/to'
+      - $ref: '#/components/parameters/stats_hashids'
+      - $ref: '#/components/parameters/query'
+      - $ref: '#/components/parameters/dfid'
+      - $ref: '#/components/parameters/device'
+      - name: metric
+        in: query
+        description: Parameter to group and filter the data based on your choice, which can be either 'brand' or 'categories'.
+        schema:
+          type: string
+          enum:
+          - brand
+          - categories
+      - name: limit
+        in: query
+        description: Maximum number of items to return with a minimum of 1 item and a maximum of 1000.
+        schema:
+          type: integer
+          default: 100
+          minimum: 1
+          maximum: 1000
+      responses:
+        200:
+          description: Stats retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResultSerchesResult'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
+        '401':
+          $ref: '#/components/responses/StatsUnauthorized'
+        '403':
+          $ref: '#/components/responses/StatsForbidden'
+        '404':
+          $ref: '#/components/responses/StatsNotFound'
+        '408':
+          $ref: '#/components/responses/StatsTimeout'
+        '429':
+          $ref: '#/components/responses/StatsTooManyRequests'
+  /api/v2/stats/visit:
+    post:
+      tags:
+      - Visits
+      summary: Visit stats
+      description: Save visit event on Doofinder statistics
+      operationId: registerVisit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRegisterRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RegisterResponse'
+        '400':
+          $ref: '#/components/responses/StatsBadRequest'
