@@ -56,7 +56,7 @@ The request is missing an `Authorization` header, or the provided API key is inv
 **Common causes:**
 - No `Authorization` header sent
 - API key has been revoked or does not exist
-- Wrong key format (e.g. missing the zone prefix for the Search API, or including it for the Management API)
+- Wrong key format (e.g. using a JWT token where a plain token is expected)
 
 ---
 

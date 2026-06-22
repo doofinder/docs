@@ -130,19 +130,6 @@ div.nav-tabs :not(a[data-active="true"]) {
   border-radius: 8px;
 }
 
-/* ── Buttons (primary) ─────────────────────────────────────────────────────── */
-button[class*='primary'],
-a[class*='button'][class*='primary'] {
-  background-color: var(--df-primary);
-  color: #fff;
-  border-radius: 6px;
-}
-
-button[class*='primary']:hover,
-a[class*='button'][class*='primary']:hover {
-  background-color: var(--df-navy);
-}
-
 /* ── Tables ────────────────────────────────────────────────────────────────── */
 thead {
   background-color: var(--df-sidebar);
