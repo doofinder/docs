@@ -58,6 +58,8 @@
     { "source": "/api/search/v5/", "destination": "/search-api/overview" },
     { "source": "/api/management/v2", "destination": "/management-api/overview" },
     { "source": "/api/management/v2/", "destination": "/management-api/overview" },
+    { "source": "/api/stats/v2", "destination": "/stats-api/overview" },
+    { "source": "/api/stats/v2/", "destination": "/stats-api/overview" },
     { "source": "/api/recommendations", "destination": "/recommendations-api/overview" },
     { "source": "/api/recommendations/", "destination": "/recommendations-api/overview" },
     { "source": "/api/category-merchandising", "destination": "/category-merchandising/overview" },
