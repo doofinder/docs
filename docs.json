@@ -168,60 +168,7 @@
             ]
           },
           {
-            "group": "Search Engines",
-            "openapi": "openapi/management-v2.yaml",
-            "pages": [
-              "GET /api/v2/search_engines/{hashid}/_process",
-              "POST /api/v2/search_engines/{hashid}/_process",
-              "GET /api/v2/search_engines/{hashid}",
-              "DELETE /api/v2/search_engines/{hashid}",
-              "PATCH /api/v2/search_engines/{hashid}",
-              "GET /api/v2/search_engines",
-              "POST /api/v2/search_engines"
-            ]
-          },
-          {
-            "group": "Indices",
-            "openapi": "openapi/management-v2.yaml",
-            "pages": [
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/temp/",
-              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/temp/",
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/_replace_by_temp/",
-              "GET /api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/",
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/",
-              "GET /api/v2/search_engines/{hashid}/indices/{name}",
-              "DELETE /api/v2/search_engines/{hashid}/indices/{name}",
-              "PATCH /api/v2/search_engines/{hashid}/indices/{name}",
-              "GET /api/v2/search_engines/{hashid}/indices",
-              "POST /api/v2/search_engines/{hashid}/indices"
-            ]
-          },
-          {
-            "group": "Items",
-            "openapi": "openapi/management-v2.yaml",
-            "pages": [
-              "GET /api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}",
-              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}",
-              "PATCH /api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}",
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk",
-              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk",
-              "PATCH /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk",
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/temp/items/",
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_mget",
-              "GET /api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}",
-              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}",
-              "PATCH /api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}",
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/items/_bulk",
-              "DELETE /api/v2/search_engines/{hashid}/indices/{name}/items/_bulk",
-              "PATCH /api/v2/search_engines/{hashid}/indices/{name}/items/_bulk",
-              "GET /api/v2/search_engines/{hashid}/indices/{name}/items/",
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/items/",
-              "POST /api/v2/search_engines/{hashid}/indices/{name}/items/_mget",
-              "GET /api/v2/search_engines/{hashid}/indices/{name}/items/_count"
-            ]
-          },
-          {
-            "group": "Bulk Index Operations",
+            "group": "Endpoints",
             "openapi": "openapi/management-v2.yaml",
             "pages": []
           }
