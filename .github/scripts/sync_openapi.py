@@ -44,8 +44,7 @@ def main():
             if 'openapi' not in group:
                 continue
             group_name = group['group']
-            if group_name in tag_ops:
-                group['pages'] = tag_ops[group_name]
+            group['pages'] = tag_ops.get(group_name, [])
         break
 
     with open(docs_json_file, 'w') as f:
