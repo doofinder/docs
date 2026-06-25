@@ -48,7 +48,7 @@ info:
 
     You can authenticate with the previous API key. The correct way to authenticate is to send a HTTP Header with the name `Authorization` and the value `Token {api-key}`.
 
-    i.e.:
+    I.e.:
 
     ```
     Authorization: Token ab46030xza33960aac71a10248489b6c26172f07
