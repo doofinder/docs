@@ -174,8 +174,6 @@ tags:
     description: All indices and temporary indices CRUD operations.
   - name: Items
     description: Handling content of indices. Allows to retrieve and update the items of an index.
-  - name: Bulk Index Operations
-    description: Temporary index management and bulk item operations on temporary indices.
   - name: Stats
     description: Provides statistical information about your search engines.
     externalDocs:
@@ -1048,7 +1046,7 @@ paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}':
     get:
       tags:
-        - Bulk Index Operations
+        - Items
       summary: Get from temporal
       description: Gets an item from the temporal index by its id.
       operationId: items_temp_show
@@ -1065,7 +1063,7 @@ paths:
                 $ref: '#/components/schemas/IndexableItem'
     delete:
       tags:
-        - Bulk Index Operations
+        - Items
       summary: Delete from temporal
       description: Deletes an item from the temporal index given its id.
       operationId: items_temp_delete
@@ -1078,7 +1076,7 @@ paths:
           description: Item deleted.
     patch:
       tags:
-        - Bulk Index Operations
+        - Items
       summary: Update from temporal
       description:
         Partially updates an item in the temporal index given its id. The operation
@@ -1101,7 +1099,7 @@ paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk':
     post:
       tags:
-        - Bulk Index Operations
+        - Items
       summary: Create in bulk in temporal
       description:
         Creates a list of items in the temporal index in a single bulk
@@ -1122,7 +1120,7 @@ paths:
       x-codegen-request-body-name: bulk
     delete:
       tags:
-        - Bulk Index Operations
+        - Items
       summary: Delete in bulk from temporal
       description:
         Deletes a list of items in the temporal index in a single bulk
@@ -1143,7 +1141,7 @@ paths:
       x-codegen-request-body-name: bulk
     patch:
       tags:
-        - Bulk Index Operations
+        - Items
       summary: Update in bulk from temporal
       description:
         Updates a list of items in the temporal index in a single bulk
@@ -1165,7 +1163,7 @@ paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/':
     post:
       tags:
-        - Bulk Index Operations
+        - Items
       summary: Create in temporal
       description: Creates an item with the data provided in the temporal index.
       operationId: items_temp_create
@@ -1189,7 +1187,7 @@ paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/_mget':
     post:
       tags:
-        - Bulk Index Operations
+        - Items
       summary: Find by ids from temporal
       description:
         Finds a list items from a temporal index in a single operation by a list of ids.
@@ -1440,7 +1438,7 @@ paths:
         - $ref: '#/components/parameters/index_name'
       responses:
         200:
-          description: Count succed.
+          description: Count succeeded.
           content:
             application/json:
               schema:
@@ -1454,7 +1452,7 @@ paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/':
     post:
       tags:
-        - Bulk Index Operations
+        - Indices
       summary: Create temporary index
       description: |
         Creates a new empty temporary index for the same index name. There can
@@ -1478,7 +1476,7 @@ paths:
                 status: OK
     delete:
       tags:
-        - Bulk Index Operations
+        - Indices
       summary: Delete temporary index
       description: |
         Deletes the temporary index. This also removes the lock in the search
@@ -1493,7 +1491,7 @@ paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/_replace_by_temp/':
     post:
       tags:
-        - Bulk Index Operations
+        - Indices
       summary: Replace indices
       description: |
         Replaces the content of the current "production" index with the content
@@ -1516,7 +1514,7 @@ paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/':
     get:
       tags:
-        - Bulk Index Operations
+        - Indices
       summary: Reindexing task status
       description: |
         Returns the status of the last scheduled reindexing tasks. If there is
@@ -1535,7 +1533,7 @@ paths:
                 $ref: '#/components/schemas/ReindexingTask'
     post:
       tags:
-        - Bulk Index Operations
+        - Indices
       summary: Reindex into temporary index
       description: |
         This executes a reindexing operation between the real index and the
