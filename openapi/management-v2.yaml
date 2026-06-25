@@ -3,12 +3,12 @@ info:
   title: Management API
   contact:
     name: Management API Support
-    url: https://docs.doofinder.com/
+    url: 'https://docs.doofinder.com/'
   version: '2.0'
   x-logo:
-    url: https://admin.doofinder.com/images/logo.svg
+    url: 'https://admin.doofinder.com/images/logo.svg'
     backgroundColor: '#33268C'
-    altText: Management API Search Engine
+    altText: 'Management API Search Engine'
   description: |
     # Introduction
 
@@ -48,7 +48,7 @@ info:
 
     You can authenticate with the previous API key. The correct way to authenticate is to send a HTTP Header with the name `Authorization` and the value `Token {api-key}`.
 
-    I.e.:
+    i.e.:
 
     ```
     Authorization: Token ab46030xza33960aac71a10248489b6c26172f07
@@ -165,31 +165,32 @@ info:
       If you want to update `best_price`, `price` and `sale_price` should be present.
 
     When your Index has `generic` preset, this defaults will not be applied.
-  termsOfService: https://www.doofinder.com/en/terms-and-conditions
+
+  termsOfService: 'https://www.doofinder.com/en/terms-and-conditions'
 tags:
-- name: SearchEngines
-  description: All search engines CRUD operations, including handling data sources processing.
-- name: Indices
-  description: All indices and temporary indices CRUD operations.
-- name: Items
-  description: Handling content of indices. Allows to retrieve and update the items of an index.
-- name: Stats
-  description: Provides statistical information about your search engines.
-  externalDocs:
-    url: https://docs.doofinder.com/api/management/v2/stats/
+  - name: SearchEngines
+    description: All search engines CRUD operations, including handling data sources processing.
+  - name: Indices
+    description: All indices and temporary indices CRUD operations.
+  - name: Items
+    description: Handling content of indices. Allows to retrieve and update the items of an index.
+  - name: Stats
+    description: Provides statistical information about your search engines.
+    externalDocs:
+      url: https://docs.doofinder.com/api/management/v2/stats/
 security:
-- api_token: []
-- jwt_token: []
+  - api_token: []
+  - jwt_token: []
 servers:
-- url: https://{search_zone}-api.doofinder.com
-  variables:
-    search_zone:
-      enum:
-      - eu1
-      - us1
-      - ap1
-      default: eu1
-- url: /
+  - url: https://{search_zone}-api.doofinder.com
+    variables:
+      search_zone:
+        enum:
+          - eu1
+          - us1
+          - ap1
+        default: eu1
+  - url: /
 components:
   securitySchemes:
     jwt_token:
@@ -219,62 +220,62 @@ components:
       type: object
       additionalProperties: false
       required:
-      - name
+        - name
       properties:
         currency:
           default: EUR
           description: Currency used in the search engine in ISO 4217 Code
           enum:
-          - AED
-          - ARS
-          - AUD
-          - BAM
-          - BDT
-          - BGN
-          - BOB
-          - BRL
-          - BYN
-          - CAD
-          - CHF
-          - CLP
-          - CNY
-          - COP
-          - CZK
-          - DKK
-          - DOP
-          - EGP
-          - EUR
-          - GBP
-          - HKD
-          - HRK
-          - HUF
-          - IDR
-          - ILS
-          - INR
-          - IRR
-          - ISK
-          - JPY
-          - KRW
-          - KWD
-          - MXN
-          - MYR
-          - NOK
-          - NZD
-          - PEN
-          - PLN
-          - RON
-          - RSD
-          - RUB
-          - SAR
-          - SEK
-          - TRY
-          - TWD
-          - UAH
-          - USD
-          - VEF
-          - VND
-          - XPF
-          - ZAR
+            - AED
+            - ARS
+            - AUD
+            - BAM
+            - BDT
+            - BGN
+            - BOB
+            - BRL
+            - BYN
+            - CAD
+            - CHF
+            - CLP
+            - CNY
+            - COP
+            - CZK
+            - DKK
+            - DOP
+            - EGP
+            - EUR
+            - GBP
+            - HKD
+            - HRK
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IRR
+            - ISK
+            - JPY
+            - KRW
+            - KWD
+            - MXN
+            - MYR
+            - NOK
+            - NZD
+            - PEN
+            - PLN
+            - RON
+            - RSD
+            - RUB
+            - SAR
+            - SEK
+            - TRY
+            - TWD
+            - UAH
+            - USD
+            - VEF
+            - VND
+            - XPF
+            - ZAR
           example: EUR
           type: string
         hashid:
@@ -284,76 +285,89 @@ components:
           example: 123456789012345678901234567890ab
         indices:
           $ref: '#/components/schemas/Indices'
-        inactive:
-          type: boolean
-          description: Indicates if the search engine has been deactivated and therefore it can not receive requests.
+        status:
+          type: string
+          description:
+            Indicates the current status of the search engine.
           readOnly: true
-          example: false
+          enum:
+            - active
+            - inactive
+          example: active
         language:
           deprecated: true
           nullable: true
           type: string
-          description: (DEPRECATED), use `locale` field instead. Curently it won't have any effect in the Search Engine.
+          description:
+            (DEPRECATED), use `locale` field instead.
+            Curently it won't have any effect in the Search Engine.
           example: es
           enum:
-          - ar
-          - hy
-          - eu
-          - pt-br
-          - bg
-          - ca
-          - cs
-          - da
-          - nl
-          - en
-          - fi
-          - fr
-          - de
-          - el
-          - hi
-          - hu
-          - id
-          - it
-          - false
-          - pt
-          - ro
-          - ru
-          - es
-          - sv
-          - tr
+            - ar
+            - hy
+            - eu
+            - pt-br
+            - bg
+            - ca
+            - cs
+            - da
+            - nl
+            - en
+            - fi
+            - fr
+            - de
+            - el
+            - hi
+            - hu
+            - id
+            - it
+            - no
+            - pt
+            - ro
+            - ru
+            - es
+            - sv
+            - tr
         locale:
           type: string
-          description: An ISO locale code is a standardized identifier combining language and region codes. The language part,
-            usually a two-letter code, is from ISO 639-1, while the region part (optional, but recommended), often a two or
-            three-letter code, is from ISO 3166-1. Determines the locale of the search engine. The locale affects how the
-            words indexed are tokenized and which stopwords to use.
+          description:
+            An ISO locale code is a standardized identifier combining language and region codes. 
+            The language part, usually a two-letter code, is from ISO 639-1, while the region part 
+            (optional, but recommended), often a two or three-letter code, is from ISO 3166-1. 
+            Determines the locale of the search engine. The locale affects how the words indexed are
+            tokenized and which stopwords to use.
           example: es-ES
         name:
           type: string
-          description: A short name that helps identifying the search engine.
+          description:
+            A short name that helps identifying the search engine.
           example: My Search Engine
         site_url:
           type: string
-          description: (Deprecated) The URL of the site to be integrated with the search engine. It determines the default
-            allowed domains for requests.
+          description:
+            (Deprecated) The URL of the site to be integrated with the search engine.
+            It determines the default allowed domains for requests.
           nullable: true
           deprecated: true
           example: http://my.web.site
         search_url:
-          description: Indicates the search server domain for this search engine. You should use this domain to perform searches
-            to this search engine.
+          description:
+            Indicates the search server domain for this search engine. You should
+            use this domain to perform searches to this search engine.
           type: string
           format: uri
           readOnly: true
           example: https://eu1-search.doofinder.com
         stopwords:
-          description: Ignores high-frequency terms like "the", "and", "is". These words have a low weight and contribute
-            little to the relevance score.
+          description:
+            Ignores high-frequency terms like "the", "and", "is". These words
+            have a low weight and contribute little to the relevance score.
           type: boolean
           default: false
           example: false
         default:
-          description: Indicates if the search engine is the default one for the store.
+          description:
+            Indicates if the search engine is the default one for the store.
           type: boolean
           default: false
           example: false
@@ -361,35 +375,40 @@ components:
           default: api
           description: Indicates which platform the search engine is associated with.
           enum:
-          - api
-          - shopify
-          - woocommerce
-          - bigcommerce
-          - crawler
-          - ecommerce
-          - ekm
-          - file
-          - magento
-          - magento2
-          - opencart
-          - oscommerce
-          - prestashop
-          - shoper
-          - shopware
+            - api
+            - shopify
+            - woocommerce
+            - bigcommerce
+            - crawler
+            - ecommerce
+            - ekm
+            - file
+            - magento
+            - magento2
+            - opencart
+            - oscommerce
+            - prestashop
+            - shoper
+            - shopware
           type: string
           example: shopify
         has_grouping:
-          description: When this option is selected, only one of the item variants is returned in the search results. This
-            only works if the indexed item have the `group_id` field.
+          description:
+            When this option is selected, only one of the item variants
+            is returned in the search results. This only works if the
+            indexed item have the `group_id` field.
           type: boolean
           default: false
         store_id:
           type: string
-          description: The Store identifier.
+          description:
+            The Store identifier.
           nullable: true
           example: e9d6fcd2-0262-4094-bf3c-671ec5da5455
-      description: A search engine groups a number of indices. Any search done to the search engine takes the best results
-        of all indices beneath. Also, search engine options applies to all its indices.
+      description:
+        A search engine groups a number of indices. Any search done to the
+        search engine takes the best results of all indices beneath. Also,
+        search engine options applies to all its indices.
     Indices:
       title: Indices
       type: array
@@ -403,36 +422,43 @@ components:
       additionalProperties: false
       properties:
         options:
-          description: General options of an index. The options schema is linked to the index preset.
+          description:
+            General options of an index. The options schema is
+            linked to the index preset.
           title: Product Index Options
           type: object
         datasources:
           $ref: '#/components/schemas/DataSources'
-      description: Index fields allowed for updates.
+      description:
+        Index fields allowed for updates.
     Index:
       title: Index
-      description: Set of options and parameters of an index. They define the way an index is built.
+      description:
+        Set of options and parameters of an index. They define the way an
+        index is built.
       required:
-      - name
-      - preset
+        - name
+        - preset
       type: object
       additionalProperties: false
       properties:
         name:
           type: string
           description: Name of the Index. It works as the index identifier.
-          pattern: ^[a-z][a-z0-9_]*$
+          pattern: '^[a-z][a-z0-9_]*$'
           example: product
         preset:
           type: string
-          description: Preset of the index. The preset defines a set of configuration parameters for the index like basic
-            fields to be included, and field transformations. For instance, the `product` preset creates the `best_price`
-            field.
+          description:
+            Preset of the index. The preset defines a set of configuration
+            parameters for the index like basic fields to be included,
+            and field transformations. For instance, the `product` preset
+            creates the `best_price` field.
           enum:
-          - generic
-          - product
-          - page
-          - category
+            - generic
+            - product
+            - page
+            - category
           example: product
         options:
           title: Index Options
@@ -448,148 +474,172 @@ components:
         $ref: '#/components/schemas/DataSource'
     DataSource:
       title: Data Source
-      description: Set of options and parameters of a datasource. They define a source of documents to be accessed and the
-        required parameters for accessing the source.
+      description:
+        Set of options and parameters of a datasource. They define a source
+        of documents to be accessed and the required parameters for accessing
+        the source.
       required:
-      - type
+        - type
       type: object
       properties:
         type:
           type: string
-          description: Type of datasource
+          description:
+            Type of datasource
           enum:
-          - bigcommerce
-          - ekm
-          - file
-          - magento2
-          - shopify
-          - shoper
-          - shopware
-          - vtex
-          - wordpress
+            - bigcommerce
+            - ekm
+            - file
+            - magento2
+            - shopify
+            - shoper
+            - shopware
+            - vtex
+            - wordpress
         options:
-          description: DataSource general options. They define required parameters for the DataSource to work or options that
-            modify the access to the data feed.
+          description:
+            DataSource general options. They define required parameters for
+            the DataSource to work or options that modify the access to the
+            data feed.
           anyOf:
-          - title: Bigcommerce Source Options
-            description: Required parameters to access a `bigcommerce` source.
-            type: object
-            required:
-            - feed_type
-            properties:
-              feed_type:
-                description: The type of content being indexed
-                type: string
-                enum:
-                - product
-                - blog_post
-                - category
-                - page
-          - title: File Source Options
-            description: Options allowed for a `file` source.
-            type: object
-            required:
-            - url
-            properties:
-              feed_type:
-                description: The type of content being indexed.
-                type: string
-                example: product
-              page_size:
-                description: Sets pagination for a file feed if possible. This option will make the processing be split into
-                  multiple steps, fetching the datasource with the `limit` (page size) and `offset` (current index) query
-                  parameters.
-                type: integer
-                nullable: true
-                default: null
-              url:
-                description: Full URI to the feed used for indexing.
-                type: string
-                example: https://mydomain.com/feed
-          - title: Magento2 Source Options
-            description: Required parameters to access a `magento2` source. It is the API base URL, the access token isn't
-              specified here.
-            type: object
-            required:
-            - feed_type
-            - url
-            properties:
-              feed_type:
-                description: The type of content being indexed
-                type: string
-                enum:
-                - product
-                - category
-                - page
-              url:
-                description: Base URL to the API of a Magento2 store.
-                type: string
-                example: https://mymagento2store.com/rest/default/V1/
-          - title: Shoper Source Options
-            description: Required parameters to access a `shoper` source.
-            type: object
-            required:
-            - feed_type
-            properties:
-              feed_type:
-                description: The type of content being indexed
-                type: string
-                enum:
-                - product
-                - category
-                - collection
-                - article
-                - page
-          - title: Shopify Source Options
-            description: Required parameters to access a `shopify` source.
-            type: object
-            required:
-            - feed_type
-            properties:
-              feed_type:
-                description: The type of content being indexed
-                type: string
-                enum:
-                - product
-                - blog_post
-                - collection
-                - page
-          - title: Shopware Source Optionss
-            description: Required parameters to access a `shopware` source.
-            type: object
-            required:
-            - feed_type
-            properties:
-              feed_type:
-                description: The type of content being indexed
-                type: string
-                enum:
-                - product
-          - title: VTEX Source Options
-            description: Required parameters to access a `vtex` source.
-            type: object
-            required:
-            - feed_type
-            properties:
-              feed_type:
-                description: The type of content being indexed
-                type: string
-                enum:
-                - product
-          - title: Wordpress Source Options
-            description: Required parameters to access a `wordpress` source.
-            type: object
-            required:
-            - feed_type
-            properties:
-              feed_type:
-                description: The type of content being indexed. It can be any value as it is obtained from the Wordpress API.
-                type: string
-                example: product
+            - title: Bigcommerce Source Options
+              description:
+                Required parameters to access a `bigcommerce` source.
+              type: object
+              required:
+                - feed_type
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed
+                  type: string
+                  enum:
+                    - product
+                    - blog_post
+                    - category
+                    - page
+            - title: File Source Options
+              description: Options allowed for a `file` source.
+              type: object
+              required:
+                - url
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed.
+                  type: string
+                  example: "product"
+                page_size:
+                  description:
+                    Sets pagination for a file feed if possible. This option
+                    will make the processing be split into multiple steps,
+                    fetching the datasource with the `limit` (page size) and
+                    `offset` (current index) query parameters.
+                  type: integer
+                  nullable: true
+                  default: null
+                url:
+                  description:
+                    Full URI to the feed used for indexing.
+                  type: string
+                  example: "https://mydomain.com/feed"
+            - title: Magento2 Source Options
+              description:
+                Required parameters to access a `magento2` source. It is the API
+                base URL, the access token isn't specified here.
+              type: object
+              required:
+                - feed_type
+                - url
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed
+                  type: string
+                  enum:
+                    - product
+                    - category
+                    - page
+                url:
+                  description:
+                    Base URL to the API of a Magento2 store.
+                  type: string
+                  example: "https://mymagento2store.com/rest/default/V1/"
+            - title: Shoper Source Options
+              description:
+                Required parameters to access a `shoper` source.
+              type: object
+              required:
+                - feed_type
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed
+                  type: string
+                  enum:
+                    - product
+                    - category
+                    - collection
+                    - article
+                    - page
+            - title: Shopify Source Options
+              description:
+                Required parameters to access a `shopify` source.
+              type: object
+              required:
+                - feed_type
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed
+                  type: string
+                  enum:
+                    - product
+                    - blog_post
+                    - collection
+                    - page
+            - title: Shopware Source Optionss
+              description:
+                Required parameters to access a `shopware` source.
+              type: object
+              required:
+                - feed_type
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed
+                  type: string
+                  enum:
+                    - product
+            - title: VTEX Source Options
+              description:
+                Required parameters to access a `vtex` source.
+              type: object
+              required:
+                - feed_type
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed
+                  type: string
+                  enum:
+                    - product
+            - title: Wordpress Source Options
+              description:
+                Required parameters to access a `wordpress` source.
+              type: object
+              required:
+                - feed_type
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed. It can be any value as it is obtained from the Wordpress API.
+                  type: string
+                  example: "product"  
       example:
         type: file
         options:
-          url: https://yourserver/your_data_feed.xml
+          url: 'https://yourserver/your_data_feed.xml'
     Scroller:
       title: Index Items Scroller
       type: object
@@ -599,30 +649,36 @@ components:
           description: Total number of items fetched by the Scroller.
         scroll_id:
           type: string
-          description: Unique identifier for the Scroller. The id should be provided for traversing all items.
+          description:
+            Unique identifier for the Scroller. The id should be provided for
+            traversing all items.
         items:
           $ref: '#/components/schemas/Items'
-      description: A scroller traverses all indexed items. It works like a pointer or pager. The first request initializes
-        the scroller and returns the scroller id with the first page of items. Subsequent requests for the same scroller id
-        will return more results. Notice that the scroller works with an snapshot of the index so, if you initialize a scroller
-        and update an item later, those changes will not be reflected in the scroller. Scrollers have an expiry time of 5
-        minutes.
+      description:
+        A scroller traverses all indexed items. It works like a pointer or pager.
+        The first request initializes the scroller and returns the scroller id
+        with the first page of items. Subsequent requests for the same scroller
+        id will return more results. Notice that the scroller works with an
+        snapshot of the index so, if you initialize a scroller and update an
+        item later, those changes will not be reflected in the scroller.
+        Scrollers have an expiry time of 5 minutes.
       example:
         total: 567
         scroll_id: 1234
         items:
-        - title: Item Title
-          link: http://www.example.com/img/1234.png
-          id: '1234'
-          df_manual_boost: 1
-          categories:
-          - cat1
-          - cat2
+          - title: Item Title
+            link: 'http://www.example.com/img/1234.png'
+            id: '1234'
+            df_manual_boost: 1
+            categories:
+              - cat1
+              - cat2
     MGETResult:
-      title: MultiGet Result
+      title:  MultiGet Result
       type: array
-      description: A list of MGET operation response. Each response shows the item id, if it was found, and the original item
-        if it was present in the index.
+      description:
+        A list of MGET operation response. Each response shows the item id, if
+        it was found, and the original item if it was present in the index.
       items:
         title: Item
         type: object
@@ -639,13 +695,13 @@ components:
           id: '1234'
           found: true
           item:
-            title: Item Title
-            link: http://www.example.com/img/1234.png
-            id: '1234'
-            df_manual_boost: 1
-            categories:
-            - cat1
-            - cat2
+              title: Item Title
+              link: 'http://www.example.com/img/1234.png'
+              id: '1234'
+              df_manual_boost: 1
+              categories:
+                - cat1
+                - cat2
     Items:
       title: Items
       type: array
@@ -667,10 +723,12 @@ components:
       maxItems: 100
       uniqueItems: true
       example:
-      - id: '1234'
+        - id: '1234'
     IndexableItem:
       title: Item
-      description: A "searchable" element. Items are the objects that form the search results.
+      description:
+       'A "searchable" element. Items are the objects that form the search
+        results.'
       type: object
       additionalProperties: true
       properties:
@@ -678,26 +736,34 @@ components:
           description: Item id
           type: string
         group_id:
-          description: This field indicates the group to which this item belongs to. All items with the same `group_id` will
-            be collapsed into one in search results, returning the most relevant one or the group leader if they all have
-            the same score.
+          description:
+            This field indicates the group to which this item belongs to. All
+            items with the same `group_id` will be collapsed into one
+            in search results, returning the most relevant one or the group
+            leader if they all have the same score.
           type: string
           nullable: true
         group_leader:
-          description: This field indicates the item chosen as the default among its group. It will be returned in search
-            results if there is no other item with a higher score.
+          description:
+            This field indicates the item chosen as the default among its group.
+            It will be returned in search results if there is no other item with
+            a higher score.
           type: boolean
           nullable: true
         df_group_leader:
-          description: (Deprecated) This field indicates the item chosen as the default among its group. It will be returned
-            in search results if there is no other item with a higher score.
+          description:
+            (Deprecated) This field indicates the item chosen as the default among its group.
+            It will be returned in search results if there is no other item with
+            a higher score.
           type: boolean
           nullable: true
           deprecated: true
         df_manual_boost:
-          description: A numeric score boosting. It multiplies the natural score of the item for a search. For instance, if
-            boost is greater than `1.0` the item will appear higher in the results. If it is lower than `1.0`, it will appear
-            lower. The minimum value is 0.0.
+          description:
+            A numeric score boosting. It multiplies the natural score of
+            the item for a search. For instance, if boost is greater than
+            `1.0` the item will appear higher in the results. If it is lower than
+            `1.0`, it will appear lower. The minimum value is 0.0.
           type: number
           format: double
           minimum: 0.0
@@ -718,11 +784,12 @@ components:
               ```
 
             This way, when using categories field in facets, it will work as expected. When Index has `generic` preset, this works as normal field but it should be string.
+
           oneOf:
-          - type: array
-            items:
-              type: string
-          - type: string
+            - type: array
+              items:
+                type: string
+            - type: string
         best_price:
           description: |
             Auto created field that gets the min value between `price` or `sale_price` fields, if added in the document.
@@ -744,19 +811,20 @@ components:
           nullable: true
       example:
         title: Adidas Originals Trefoil Hoodie
-        link: https://woocommerce.doofinder.com/product/adidas-originals-trefoil-hoodie/
-        image_link: https://woocommerce.doofinder.com/wp-content/uploads/2024/02/suda-6-scaled.jpg
+        link: 'https://woocommerce.doofinder.com/product/adidas-originals-trefoil-hoodie/'
+        image_link: 'https://woocommerce.doofinder.com/wp-content/uploads/2024/02/suda-6-scaled.jpg'
         id: '1234'
         color: blue
         price: 15.99
         sale_price: 11.99
         categories:
-        - Clothes > Hoodie
-        - Men > Hoodie
+          - Clothes > Hoodie
+          - Men > Hoodie
     BulkRequest:
       title: Bulk Request
       type: array
-      description: A list of items data for a bulk operation with a minimum of 1 item and a maximum of 100.
+      description:
+        A list of items data for a bulk operation with a minimum of 1 item and a maximum of 100.
       items:
         $ref: '#/components/schemas/IndexableItem'
       minItems: 1
@@ -776,9 +844,9 @@ components:
                 description: Result of the operation.
                 type: string
                 enum:
-                - created
-                - updated
-                - deleted
+                  - created
+                  - updated
+                  - deleted
               id:
                 description: Item unique identifier.
                 type: string
@@ -791,8 +859,8 @@ components:
           type: boolean
       example:
         results:
-        - result: updated
-          id: '1234'
+          - result: updated
+            id: '1234'
         errors: false
     ProcessingTask:
       title: Processing Task
@@ -803,7 +871,8 @@ components:
           description: Status of the task.
           type: string
         result:
-          description: Result of the task. It will be just `OK` or some error description.
+          description:
+            Result of the task. It will be just `OK` or some error description.
           type: string
         finished_at:
           description: ISO 8601 datetime string when the task has finished.
@@ -819,103 +888,69 @@ components:
       type: object
       properties:
         status:
-          description: Indicates the current status of the task.
+          description:
+            Indicates the current status of the task.
           type: string
           enum:
-          - completed
-          - reindexing
-          - error
-          - failure
+            - completed
+            - reindexing
+            - error
+            - failure
           readOnly: true
         progress:
-          description: Indicates the progress of the reindexing operation. For instance, 0.5 means the task is half complete.
-            (Minimum 0.0 and maximum 1.0)
+          description:
+            Indicates the progress of the reindexing operation.
+            For instance, 0.5 means the task is half complete. (Minimum 0.0 and maximum 1.0)
           type: number
           format: float
           minimum: 0.0
           maximum: 1.0
           readOnly: true
         failures:
-          description: If status is `failure` this contains a list of all failures recieved while reindexing.
+          description:
+            If status is `failure` this contains a list of all
+            failures recieved while reindexing.
           type: array
           items:
             type: string
-            example: 'failed to parse field [price] of type [short] in document with id ''id''. Preview of field''s value:
-              ''nil'''
+            example:
+              "failed to parse field [price] of type [short] in document with id
+              'id'. Preview of field's value: 'nil'"
         error:
-          description: If status is `error` this shows the error details.
+          description:
+            If status is `error` this shows the error details.
           type: object
           properties:
             reason:
-              description: A verbose description of the error returned.
+              description:
+                A verbose description of the error returned.
               type: string
             type:
-              description: Type of error
+              description:
+                Type of error
               type: string
       example:
         progress: 1.0
         status: completed
-    ManagementErrorDetail:
-      type: object
-      description: Details about a specific validation failure on a field.
-      properties:
-        name:
-          type: string
-          description: Field name.
-          example: language
-        fields:
-          type: array
-          items:
-            type: string
-          description: Affected field names.
-          example:
-          - language
-        reason:
-          type: string
-          description: Validation failure reason.
-          example: is invalid
-    ManagementError:
-      type: object
-      description: Standard error wrapper for all Management API error responses.
-      properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-              description: Machine-readable error code.
-              example: not_found
-            message:
-              type: string
-              description: Human-readable error description.
-              example: Not found
-            details:
-              type: array
-              description: Optional list of per-field validation details (present on bad_params and errors_in_fields).
-              items:
-                $ref: '#/components/schemas/ManagementErrorDetail'
-          required:
-          - code
-          - message
-      required:
-      - error
   parameters:
     searchengine_hashid:
       name: hashid
       in: path
-      description: Unique id of a search engine.
+      description:
+        Unique id of a search engine.
       required: true
       schema:
         type: string
-        pattern: ^[a-f0-9]{32}$
+        pattern: '^[a-f0-9]{32}$'
     index_name:
       name: name
       in: path
-      description: Name of an index.
+      description:
+        Name of an index.
       required: true
       schema:
         type: string
-        pattern: ^[a-z][a-z0-9_]*$
+        pattern: '^[a-z][a-z0-9_]*$'
     item_id:
       name: item_id
       in: path
@@ -926,19 +961,19 @@ components:
     from:
       name: from
       in: query
-      description: Start date of the period in the format of UNIX timestamp or YYYYMMDD.
+      description: 'Start date of the period in the format of UNIX timestamp or YYYYMMDD.'
       required: true
       schema:
         type: string
-        pattern: ^20\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$|^\d{10}|^\d{13}$
+        pattern: '^20\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$|^\d{10}|^\d{13}$'
     to:
       name: to
       in: query
-      description: End date of the period in the format of UNIX timestamp or YYYYMMDD.
+      description: 'End date of the period in the format of UNIX timestamp or YYYYMMDD.'
       required: true
       schema:
         type: string
-        pattern: ^20\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$|^\d{10}$|^\d{13}
+        pattern: '^20\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$|^\d{10}$|^\d{13}'
     format:
       name: format
       in: query
@@ -946,9 +981,7 @@ components:
       schema:
         type: string
         default: json
-        enum:
-        - json
-        - csv
+        enum: [json, csv]
     tz:
       name: tz
       in: query
@@ -958,16 +991,15 @@ components:
       schema:
         type: string
         default: Etc/UTC
-      example: Europe/Madrid
+      example:
+        Europe/Madrid
     device:
       name: device
       in: query
-      description: Filter by kind of device.
+      description: 'Filter by kind of device.'
       schema:
         type: string
-        enum:
-        - desktop
-        - mobile
+        enum: [desktop, mobile]
     facet:
       name: facet
       in: query
@@ -979,7 +1011,9 @@ components:
     query_name:
       name: query_name
       in: query
-      description: Type of query to filter by. Arrays parameters must be in the format `param[]=value`.
+      description:
+        Type of query to filter by.
+        Arrays parameters must be in the format `param[]=value`.
       schema:
         type: array
         items:
@@ -1002,146 +1036,24 @@ components:
             description: Exclude by the number of search results.
   responses:
     BulkResponse:
-      description: Bulk operation successful.
+      description:
+        Bulk operation successful.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/BulkResult'
-    BadRequest:
-      description: Bad Request — invalid or missing parameters.
-      content:
-        application/json:
-          schema: &id001
-            $ref: '#/components/schemas/ManagementError'
-          example:
-            error:
-              code: bad_params
-              message: Bad parameters error
-              details:
-              - name: language
-                fields:
-                - language
-                reason: is invalid
-    Unauthorized:
-      description: Unauthorized — no valid API token provided.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: not_authenticated
-              message: Authentication required
-    Forbidden:
-      description: Forbidden — token is valid but does not have access to this resource.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: access_denied
-              message: Access denied
-    NotFound:
-      description: Not Found — the requested resource does not exist.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: not_found
-              message: Not found
-    Timeout:
-      description: Request Timeout — the search engine or index is busy; retry after a short delay.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: searchengine_timeout
-              message: Timeout connecting to backend
-    Conflict:
-      description: Conflict — the search engine is locked for processing or in an inactive state.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: searchengine_locked
-              message: Search engine is being processed
-    ConflictIndexExists:
-      description: Conflict — an index with that name already exists.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: index_exists
-              message: Index already exists
-    ConflictTooManyTemp:
-      description: Conflict — a temporary index already exists for this index.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: too_many_temporary
-              message: A temporary index already exists for this index
-    TooManyItemsBody:
-      description: Request Entity Too Large — the bulk payload exceeds 8 MB.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: too_many_items
-              message: Body is too large (max 8 MB)
-    TooManyItemsBulk:
-      description: Unprocessable Entity — the bulk array exceeds 100 items.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: too_many_items
-              message: Too many items in bulk request (max 100)
-    TooManyRequests:
-      description: Too Many Requests — rate limit exceeded; back off and retry.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: too_many_requests
-              message: Too many requests
-    InternalServerError:
-      description: Internal Server Error — unexpected backend failure.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: internal_error
-              message: Internal server error
-    ServiceUnavailable:
-      description: Service Unavailable — the Doomanager service is temporarily unavailable.
-      content:
-        application/json:
-          schema: *id001
-          example:
-            error:
-              code: doomanager_unavailable
-              message: Processing service is temporarily unavailable
 paths:
-  /api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}:
+  '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}':
     get:
       tags:
-      - Items
+        - Items
       summary: Get from temporal
       description: Gets an item from the temporal index by its id.
       operationId: items_temp_show
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
-      - $ref: '#/components/parameters/item_id'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/item_id'
       responses:
         200:
           description: Item retrieved.
@@ -1149,49 +1061,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
-      - Items
+        - Items
       summary: Delete from temporal
       description: Deletes an item from the temporal index given its id.
       operationId: items_temp_delete
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
-      - $ref: '#/components/parameters/item_id'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/item_id'
       responses:
         '204':
           description: Item deleted.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
-      - Items
+        - Items
       summary: Update from temporal
-      description: Partially updates an item in the temporal index given its id. The operation will return the updated item.
+      description:
+        Partially updates an item in the temporal index given its id. The operation
+        will return the updated item.
       operationId: items_temp_update
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
-      - $ref: '#/components/parameters/item_id'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/item_id'
       requestBody:
         content:
           application/json:
@@ -1201,33 +1095,19 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: item
-  /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk:
+  '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk':
     post:
       tags:
-      - Items
+        - Items
       summary: Create in bulk in temporal
-      description: Creates a list of items in the temporal index in a single bulk operation.
+      description:
+        Creates a list of items in the temporal index in a single bulk
+        operation.
       operationId: items_temp_bulk_create
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1237,36 +1117,18 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
     delete:
       tags:
-      - Items
+        - Items
       summary: Delete in bulk from temporal
-      description: Deletes a list of items in the temporal index in a single bulk operation.
+      description:
+        Deletes a list of items in the temporal index in a single bulk
+        operation.
       operationId: items_temp_bulk_delete
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1276,36 +1138,18 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
     patch:
       tags:
-      - Items
+        - Items
       summary: Update in bulk from temporal
-      description: Updates a list of items in the temporal index in a single bulk operation.
+      description:
+        Updates a list of items in the temporal index in a single bulk
+        operation.
       operationId: items_temp_bulk_update
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1315,37 +1159,17 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
-  /api/v2/search_engines/{hashid}/indices/{name}/temp/items/:
+  '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/':
     post:
       tags:
-      - Items
+        - Items
       summary: Create in temporal
       description: Creates an item with the data provided in the temporal index.
       operationId: items_temp_create
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1359,33 +1183,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: item
-  /api/v2/search_engines/{hashid}/indices/{name}/temp/items/_mget:
+  '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/_mget':
     post:
       tags:
-      - Items
+        - Items
       summary: Find by ids from temporal
-      description: Finds a list items from a temporal index in a single operation by a list of ids.
+      description:
+        Finds a list items from a temporal index in a single operation by a list of ids.
       operationId: items_temp_mget
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1399,29 +1208,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MGETResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}:
+  '/api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}':
     get:
       tags:
-      - Items
+        - Items
       summary: Get
       description: Gets an item from the index by its id.
       operationId: item_show
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
-      - $ref: '#/components/parameters/item_id'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/item_id'
       responses:
         200:
           description: Item retrieved.
@@ -1429,49 +1226,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
-      - Items
+        - Items
       summary: Delete
       description: Deletes item from the index by its id.
       operationId: item_delete
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
-      - $ref: '#/components/parameters/item_id'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/item_id'
       responses:
         '204':
           description: Item deleted.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
-      - Items
+        - Items
       summary: Update
-      description: Partially updates item from index by its id. The operation returns the updated item.
+      description:
+        Partially updates item from index by its id. The operation returns the
+        updated item.
       operationId: item_update
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
-      - $ref: '#/components/parameters/item_id'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/item_id'
       requestBody:
         content:
           application/json:
@@ -1485,33 +1264,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: item
-  /api/v2/search_engines/{hashid}/indices/{name}/items/_bulk:
+  '/api/v2/search_engines/{hashid}/indices/{name}/items/_bulk':
     post:
       tags:
-      - Items
+        - Items
       summary: Create in bulk
-      description: Creates a list of items in the index in a single bulk operation.
+      description:
+        Creates a list of items in the index in a single bulk operation.
       operationId: items_bulk_create
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1521,36 +1285,17 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
     delete:
       tags:
-      - Items
+        - Items
       summary: Delete in bulk
-      description: Deletes a list of items from the index in a single bulk operation.
+      description:
+        Deletes a list of items from the index in a single bulk operation.
       operationId: items_bulk_delete
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1560,36 +1305,17 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
     patch:
       tags:
-      - Items
+        - Items
       summary: Update in bulk
-      description: Updates a list of items from the index in a single bulk operation.
+      description:
+        Updates a list of items from the index in a single bulk operation.
       operationId: items_bulk_update
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1599,67 +1325,52 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
-  /api/v2/search_engines/{hashid}/indices/{name}/items/:
+  '/api/v2/search_engines/{hashid}/indices/{name}/items/':
     get:
       tags:
-      - Items
+        - Items
       summary: Scroll index
-      description: Scrolls through all the items of an index. The first request starts the scroll and generate a scroll id
-        that can be traversed with each successive requests. There is a limited time period on which the traverse is possible.
-        After 5 minutes the scroll expires and it is no longer accesible, a new request should be made to traverse items again
+      description:
+        Scrolls through all the items of an index. The first request starts the
+        scroll and generate a scroll id that can be traversed with each
+        successive requests. There is a limited time period on which the
+        traverse is possible. After 5 minutes the scroll expires and it is no
+        longer accesible, a new request should be made to traverse items again
         from the beginning.
       operationId: item_index
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
-      - name: scroll_id
-        in: query
-        description: Unique identifier for the scroll. The scroll saves a "pointer" to the last fetched page so each successive
-          request to the same scroll_id return a new page.
-        schema:
-          type: string
-      - name: rpp
-        in: query
-        description: Results per page. How many items are fetched per page/request with a maximum of 100.
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 100
-      - name: use_full_index
-        in: query
-        description: Use full index. If true, the full index name will be used instead of the alias. Usually used so the out
-          of stock items are included.
-        schema:
-          type: boolean
-          default: false
-      - name: group_id
-        in: query
-        description: Item variant group identifier. Useful param to filter by a specific variant.
-        required: false
-        schema:
-          type: string
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
+        - name: scroll_id
+          in: query
+          description:
+            'Unique identifier for the scroll. The scroll saves a "pointer" to
+            the last fetched page so each successive request to the same
+            scroll_id return a new page.'
+          schema:
+            type: string
+        - name: rpp
+          in: query
+          description: Results per page. How many items are fetched per page/request with a maximum of 100.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 100
+        - name: use_full_index
+          in: query
+          description: Use full index. If true, the full index name will be used instead of the alias. Usually used so the out of stock items are included.
+          schema:
+            type: boolean
+            default: false
+        - name: group_id
+          in: query
+          description:
+            'Item variant group identifier. Useful param to filter by a specific variant.'
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: Scroller retrieved.
@@ -1667,25 +1378,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Scroller'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Items
+        - Items
       summary: Create
       description: Creates an item in the index with the data provided.
       operationId: item_create
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1699,33 +1400,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: item
-  /api/v2/search_engines/{hashid}/indices/{name}/items/_mget:
+  '/api/v2/search_engines/{hashid}/indices/{name}/items/_mget':
     post:
       tags:
-      - Items
+        - Items
       summary: Find by ids
-      description: Finds a list items in a single operation by a list of ids.
+      description:
+        Finds a list items in a single operation by a list of ids.
       operationId: item_mget
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -1739,28 +1425,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MGETResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /api/v2/search_engines/{hashid}/indices/{name}/items/_count:
+  '/api/v2/search_engines/{hashid}/indices/{name}/items/_count':
     get:
       tags:
-      - Items
+        - Items
       summary: Items count
-      description: Returns the total number of items in an index.
+      description:
+        Returns the total number of items in an index.
       operationId: item_count
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       responses:
         200:
           description: Count succed.
@@ -1774,20 +1449,10 @@ paths:
                     description: total items on indice
               example:
                 count: 100
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /api/v2/search_engines/{hashid}/indices/{name}/temp/:
+  '/api/v2/search_engines/{hashid}/indices/{name}/temp/':
     post:
       tags:
-      - Indices
+        - Indices
       summary: Create temporary index
       description: |
         Creates a new empty temporary index for the same index name. There can
@@ -1797,8 +1462,8 @@ paths:
         the temporary index is deleted.
       operationId: temporary_index_create
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       responses:
         '201':
           description: Temporary index created.
@@ -1809,59 +1474,36 @@ paths:
                 properties: {}
               example:
                 status: OK
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/ConflictTooManyTemp'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
-      - Indices
+        - Indices
       summary: Delete temporary index
       description: |
         Deletes the temporary index. This also removes the lock in the search
         engine. If there is no temporary index this will return a 404 (Not found).
       operationId: temporary_index_delete
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       responses:
         '204':
           description: Temporary index deleted.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /api/v2/search_engines/{hashid}/indices/{name}/_replace_by_temp/:
+  '/api/v2/search_engines/{hashid}/indices/{name}/_replace_by_temp/':
     post:
       tags:
-      - Indices
+        - Indices
       summary: Replace indices
       description: |
         Replaces the content of the current "production" index with the content
         of the temporary one.
       operationId: replace_by_temp
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       responses:
         200:
-          description: Indices replacement completed.
+          description:
+            Indices replacement completed.
           content:
             application/json:
               schema:
@@ -1869,52 +1511,29 @@ paths:
                 properties: {}
               example:
                 status: OK
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/:
+  '/api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/':
     get:
       tags:
-      - Indices
+        - Indices
       summary: Reindexing task status
       description: |
         Returns the status of the last scheduled reindexing tasks. If there is
         none, or the task finished more than 24 hours ago, it will return a 404 error.
       operationId: get_reindexing_status
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       responses:
         200:
-          description: The current reindexing taks was retrieved.
+          description:
+            The current reindexing taks was retrieved.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReindexingTask'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Indices
+        - Indices
       summary: Reindex into temporary index
       description: |
         This executes a reindexing operation between the real index and the
@@ -1923,11 +1542,12 @@ paths:
         This will return a 404 (Not found) if there is no temporary index.
       operationId: reindex_to_temp
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       responses:
         200:
-          description: Reindexing task scheduled successfully.
+          description:
+            Reindexing task scheduled successfully.
           content:
             application/json:
               schema:
@@ -1935,30 +1555,16 @@ paths:
                 properties: {}
               example:
                 status: OK
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /api/v2/search_engines/{hashid}/indices/{name}:
+  '/api/v2/search_engines/{hashid}/indices/{name}':
     get:
       tags:
-      - Indices
+        - Indices
       summary: Get
       description: Gets a search engine index.
       operationId: index_show
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       responses:
         200:
           description: Index retrieved.
@@ -1966,47 +1572,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Index'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
-      - Indices
+        - Indices
       summary: Delete
       description: Deletes a search engine index.
       operationId: index_delete
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       responses:
         '204':
           description: Index deleted.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
-      - Indices
+        - Indices
       summary: Update
       description: Updates a search engine index.
       operationId: index_update
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
-      - $ref: '#/components/parameters/index_name'
+        - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/index_name'
       requestBody:
         content:
           application/json:
@@ -2020,32 +1606,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Index'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: index
-  /api/v2/search_engines/{hashid}/indices:
+  '/api/v2/search_engines/{hashid}/indices':
     get:
       tags:
-      - Indices
+        - Indices
       summary: List
       description: List all indices of search engine.
       operationId: index_index
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/searchengine_hashid'
       responses:
         200:
           description: Indices retrieved.
@@ -2053,24 +1623,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Indices'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Indices
+        - Indices
       summary: Create
       description: Creates a new index for a search engine.
       operationId: index_create
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/searchengine_hashid'
       requestBody:
         content:
           application/json:
@@ -2084,31 +1644,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Index'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/ConflictIndexExists'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: index
-  /api/v2/search_engines/{hashid}/_process:
+  '/api/v2/search_engines/{hashid}/_process':
     get:
       tags:
-      - SearchEngines
+        - SearchEngines
       summary: Get process task status
-      description: Gets the status of the last process task. Status persists for 72 hours. If there is no recent task, it
-        will return an error.
+      description:
+        Gets the status of the last process task. Status persists for 72 hours.
+        If there is no recent task, it will return an error.
       operationId: process_status
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/searchengine_hashid'
       responses:
         200:
           description: Task details retrieved.
@@ -2116,24 +1663,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProcessingTask'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - SearchEngines
+        - SearchEngines
       summary: Process
-      description: Schedules a task for processing all search engine's data sources.
+      description:
+        Schedules a task for processing all search engine's data sources.
       operationId: process
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/searchengine_hashid'
       requestBody:
         content:
           application/json:
@@ -2141,8 +1679,10 @@ paths:
               type: object
               properties:
                 callback_url:
-                  description: When the tasks finishes, the systems calls to the provided URL giving the final status of the
-                    task. URL must use HTTPS. The call will be a POST, with the data result on the body.
+                  description:
+                    When the tasks finishes, the systems calls to the provided URL
+                    giving the final status of the task. URL must use HTTPS.
+                    The call will be a POST, with the data result on the body.
                   type: string
                   format: url
                   example: https://example_url.com
@@ -2165,29 +1705,15 @@ paths:
                 example:
                   href: /api/v2/search_engines/{hashid}/_process
                   message: PROCESS_CREATED
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-  /api/v2/search_engines/{hashid}:
+  '/api/v2/search_engines/{hashid}':
     get:
       tags:
-      - SearchEngines
+        - SearchEngines
       summary: Get
       description: Gets a search engine details.
       operationId: search_engine_show
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/searchengine_hashid'
       responses:
         200:
           description: Search engine retrieved.
@@ -2195,45 +1721,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchEngine'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
-      - SearchEngines
+        - SearchEngines
       summary: Delete
       description: Deletes a search engine.
       operationId: search_engine_delete
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/searchengine_hashid'
       responses:
         '204':
           description: Search engines deleted.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
-      - SearchEngines
+        - SearchEngines
       summary: Update
       description: Updates a search engine.
       operationId: search_engine_update
       parameters:
-      - $ref: '#/components/parameters/searchengine_hashid'
+        - $ref: '#/components/parameters/searchengine_hashid'
       requestBody:
         content:
           application/json:
@@ -2247,27 +1753,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchEngine'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: searchengine
-  /api/v2/search_engines:
+  '/api/v2/search_engines':
     get:
       tags:
-      - SearchEngines
+        - SearchEngines
       summary: List
       description: Lists all user's search engines.
       operationId: search_engine_list
@@ -2278,21 +1768,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchEngines'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - SearchEngines
+        - SearchEngines
       summary: Create
-      description: Creates a new search engine with the provided data. It is not possible to run searches against the new
-        search engine as it does not have any index yet. You must create an index belonging to the new search engine to be
-        able to make searches.
+      description:
+        Creates a new search engine with the provided data. It is not possible to run searches
+        against the new search engine as it does not have any index yet. You must create an index
+        belonging to the new search engine to be able to make searches.
       operationId: search_engine_create
       requestBody:
         content:
@@ -2307,14 +1790,4 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchEngine'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: searchengine
