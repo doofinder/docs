@@ -932,6 +932,50 @@ components:
       example:
         progress: 1.0
         status: completed
+    ManagementErrorDetail:
+      type: object
+      description: Details about a specific validation failure on a field.
+      properties:
+        name:
+          type: string
+          description: Field name.
+          example: language
+        fields:
+          type: array
+          items:
+            type: string
+          description: Affected field names.
+          example:
+            - language
+        reason:
+          type: string
+          description: Validation failure reason.
+          example: is invalid
+    ManagementError:
+      type: object
+      description: Standard error wrapper for all Management API error responses.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code.
+              example: not_found
+            message:
+              type: string
+              description: Human-readable error description.
+              example: Not found
+            details:
+              type: array
+              description: Optional list of per-field validation details (present on bad_params and errors_in_fields).
+              items:
+                $ref: '#/components/schemas/ManagementErrorDetail'
+          required:
+            - code
+            - message
+      required:
+        - error
   parameters:
     searchengine_hashid:
       name: hashid
@@ -1042,6 +1086,141 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BulkResult'
+    BadRequest:
+      description: 'Bad Request — invalid or missing parameters.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: bad_params
+              message: Bad parameters error
+              details:
+                - name: language
+                  fields:
+                    - language
+                  reason: is invalid
+    Unauthorized:
+      description: 'Unauthorized — no valid API token provided.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: not_authenticated
+              message: Authentication required
+    Forbidden:
+      description: 'Forbidden — token is valid but does not have access to this resource.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: access_denied
+              message: Access denied
+    NotFound:
+      description: 'Not Found — the requested resource does not exist.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: not_found
+              message: Not found
+    Timeout:
+      description: 'Request Timeout — the search engine or index is busy; retry after a short delay.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: searchengine_timeout
+              message: Timeout connecting to backend
+    Conflict:
+      description: 'Conflict — the search engine is locked for processing or in an inactive state.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: searchengine_locked
+              message: Search engine is being processed
+    ConflictIndexExists:
+      description: 'Conflict — an index with that name already exists.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: index_exists
+              message: Index already exists
+    ConflictTooManyTemp:
+      description: 'Conflict — a temporary index already exists for this index.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: too_many_temporary
+              message: A temporary index already exists for this index
+    TooManyItemsBody:
+      description: 'Request Entity Too Large — the bulk payload exceeds 8 MB.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: too_many_items
+              message: Body is too large (max 8 MB)
+    TooManyItemsBulk:
+      description: 'Unprocessable Entity — the bulk array exceeds 100 items.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: too_many_items
+              message: Too many items in bulk request (max 100)
+    TooManyRequests:
+      description: 'Too Many Requests — rate limit exceeded; back off and retry.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: too_many_requests
+              message: Too many requests
+    InternalServerError:
+      description: 'Internal Server Error — unexpected backend failure.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: internal_error
+              message: Internal server error
+    ServiceUnavailable:
+      description: 'Service Unavailable — the Doomanager service is temporarily unavailable.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: doomanager_unavailable
+              message: Processing service is temporarily unavailable
 paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}':
     get:
@@ -1061,6 +1240,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Items
@@ -1074,6 +1263,16 @@ paths:
       responses:
         '204':
           description: Item deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Items
@@ -1095,6 +1294,22 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: item
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk':
     post:
@@ -1117,6 +1332,26 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/TooManyItemsBody'
+        '422':
+          $ref: '#/components/responses/TooManyItemsBulk'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
     delete:
       tags:
@@ -1138,6 +1373,26 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/TooManyItemsBody'
+        '422':
+          $ref: '#/components/responses/TooManyItemsBulk'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
     patch:
       tags:
@@ -1159,6 +1414,26 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/TooManyItemsBody'
+        '422':
+          $ref: '#/components/responses/TooManyItemsBulk'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/':
     post:
@@ -1183,6 +1458,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: item
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/_mget':
     post:
@@ -1208,6 +1499,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MGETResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   '/api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}':
     get:
       tags:
@@ -1226,6 +1529,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Items
@@ -1239,6 +1552,16 @@ paths:
       responses:
         '204':
           description: Item deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Items
@@ -1264,6 +1587,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: item
   '/api/v2/search_engines/{hashid}/indices/{name}/items/_bulk':
     post:
@@ -1285,6 +1624,26 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/TooManyItemsBody'
+        '422':
+          $ref: '#/components/responses/TooManyItemsBulk'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
     delete:
       tags:
@@ -1305,6 +1664,26 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/TooManyItemsBody'
+        '422':
+          $ref: '#/components/responses/TooManyItemsBulk'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
     patch:
       tags:
@@ -1325,6 +1704,26 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/BulkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/TooManyItemsBody'
+        '422':
+          $ref: '#/components/responses/TooManyItemsBulk'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: bulk
   '/api/v2/search_engines/{hashid}/indices/{name}/items/':
     get:
@@ -1378,6 +1777,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Scroller'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Items
@@ -1400,6 +1809,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexableItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: item
   '/api/v2/search_engines/{hashid}/indices/{name}/items/_mget':
     post:
@@ -1425,6 +1850,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MGETResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   '/api/v2/search_engines/{hashid}/indices/{name}/items/_count':
     get:
       tags:
@@ -1449,6 +1886,16 @@ paths:
                     description: total items on indice
               example:
                 count: 100
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/':
     post:
       tags:
@@ -1474,6 +1921,20 @@ paths:
                 properties: {}
               example:
                 status: OK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ConflictTooManyTemp'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Indices
@@ -1488,6 +1949,16 @@ paths:
       responses:
         '204':
           description: Temporary index deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   '/api/v2/search_engines/{hashid}/indices/{name}/_replace_by_temp/':
     post:
       tags:
@@ -1511,6 +1982,20 @@ paths:
                 properties: {}
               example:
                 status: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   '/api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/':
     get:
       tags:
@@ -1531,6 +2016,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReindexingTask'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Indices
@@ -1555,6 +2050,20 @@ paths:
                 properties: {}
               example:
                 status: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   '/api/v2/search_engines/{hashid}/indices/{name}':
     get:
       tags:
@@ -1572,6 +2081,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Index'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Indices
@@ -1584,6 +2103,16 @@ paths:
       responses:
         '204':
           description: Index deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Indices
@@ -1606,6 +2135,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Index'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: index
   '/api/v2/search_engines/{hashid}/indices':
     get:
@@ -1623,6 +2168,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Indices'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Indices
@@ -1644,6 +2199,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Index'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ConflictIndexExists'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: index
   '/api/v2/search_engines/{hashid}/_process':
     get:
@@ -1663,6 +2232,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProcessingTask'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Search Engines
@@ -1705,6 +2284,20 @@ paths:
                 example:
                   href: /api/v2/search_engines/{hashid}/_process
                   message: PROCESS_CREATED
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}':
     get:
       tags:
@@ -1721,6 +2314,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchEngine'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Search Engines
@@ -1732,6 +2335,16 @@ paths:
       responses:
         '204':
           description: Search engines deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     patch:
       tags:
         - Search Engines
@@ -1753,6 +2366,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchEngine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: searchengine
   '/api/v2/search_engines':
     get:
@@ -1768,6 +2397,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchEngines'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Search Engines
@@ -1790,4 +2427,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchEngine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       x-codegen-request-body-name: searchengine
