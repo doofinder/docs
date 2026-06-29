@@ -1807,8 +1807,8 @@ paths:
       - Clicks & Interactions
   /api/v2/stats/results/top:
     get:
-      description: Gets the most commonly <metric> obtained in searches during a time
-        period. Where <metric> can be brand or categories.
+      description: Gets the most commonly `metric` obtained in searches during a time
+        period. Where `metric` can be brand or categories.
       operationId: resultsSearches
       parameters:
       - $ref: '#/components/parameters/from'
