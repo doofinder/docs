@@ -1,21 +1,38 @@
 openapi: 3.0.0
 info:
   title: Category Merchandising API
-  version: '1.0'
+  version: "1.0"
   x-logo:
-    url: https://admin.doofinder.com/images/logo.svg
+    url: 'https://admin.doofinder.com/images/logo.svg'
     backgroundColor: '#33268C'
     altText: Doofinder API Reference
   description: |
     The Category Merchandising API returns search results for a category page.
+    Requests are made to `https://{zone}-category-merchandising.doofinder.com/api/1` — for example,
+    `https://eu1-category-merchandising.doofinder.com/api/1` for the EU region.
 
     It matches the request URL against URL patterns configured in your search engine and applies
     the corresponding filter, returning a paginated result set suitable for rendering a category
     listing page.
 
+    You can manage your category pages and URL patterns in the
+    [Doofinder admin panel](https://admin.doofinder.com) under **Category Merchandising → Configuration**.
+
     # Authentication
 
-    All requests require an `Authorization` header with a valid API token:
+    The API supports two authentication methods:
+
+    ## CORS (browser requests)
+
+    When a request originates from a domain registered as an allowed origin for the search engine,
+    the API authenticates it automatically via CORS — no `Authorization` header is required.
+    Allowed origins are derived from the site URL configured in your search engine settings in the
+    [Doofinder admin panel](https://admin.doofinder.com).
+
+    ## API Token (server-side requests)
+
+    For requests that do not come from an allowed origin, include an `Authorization` header with a
+    valid API token:
 
     ```
     Authorization: Token {your_token}
@@ -42,29 +59,33 @@ info:
 
     Facets associated with fields used by the pattern filter are excluded from the response,
     as those dimensions are locked by the URL and cannot be changed by the user.
+
 servers:
-- url: https://{zone}-category-merchandising.doofinder.com/api/1
-  description: Category Merchandising API
-  variables:
-    zone:
-      default: eu1
-      enum:
-      - eu1
-      - us1
-      - ap1
-      description: Geographic zone of your search engine. Use the zone that matches your search engine region.
+  - url: https://{zone}-category-merchandising.doofinder.com/api/1
+    description: Category Merchandising API
+    variables:
+      zone:
+        default: eu1
+        enum:
+          - eu1
+          - us1
+          - ap1
+        description: Geographic zone of your search engine. Use the zone that matches your search engine region.
+
 security:
-- ApiToken: []
+  - ApiToken: []
+
 tags:
-- name: Category Merchandising
-  description: Retrieve search results for a category page
+  - name: Category Merchandising
+    description: Retrieve search results for a category page
+
 paths:
   /category_merchandising/{hashid}:
     get:
       operationId: getCategoryMerchandisingResults
       summary: Get category page results
       tags:
-      - Category Merchandising
+        - Category Merchandising
       description: |
         Returns search results for the category page whose URL pattern matches the provided `url`.
 
@@ -77,107 +98,105 @@ paths:
         configured in the category page settings is applied. If neither is configured, results
         are returned in the engine's default order.
       parameters:
-      - name: hashid
-        in: path
-        required: true
-        description: Search Engine ID (also known as hashid).
-        schema:
-          type: string
-          example: abc1234de
-      - name: url
-        in: query
-        required: true
-        description: |
-          Full URL of the category page to match against the configured URL patterns.
-          Query string and fragment are stripped before matching.
-        schema:
-          type: string
-          example: https://example.com/categories/shoes.html
-      - name: currency
-        in: query
-        required: false
-        description: |
-          ISO 4217 currency code. When provided, prices are converted to this currency
-          using the exchange rates configured in the search engine.
-        schema:
-          type: string
-          example: EUR
-      - name: page
-        in: query
-        required: false
-        description: Page number (1-indexed). Defaults to `1`.
-        schema:
-          type: integer
-          default: 1
-          minimum: 1
-          example: 2
-      - name: rpp
-        in: query
-        required: false
-        description: Number of results per page. Defaults to `50`.
-        schema:
-          type: integer
-          default: 50
-          minimum: 1
-          example: 24
-      - name: sort[N][field]
-        in: query
-        required: false
-        description: |
-          Sort criteria in indexed map format. `N` is a 0-based integer that defines the
-          sort priority. `field` is the name of the field to sort by, and the value is the
-          direction (`asc` or `desc`).
-
-          Example: `sort[0][price]=asc&sort[1][brand]=desc` sorts first by price ascending,
-          then by brand descending.
-
-          If omitted, the sort configured in the category page settings is used.
-        schema:
-          type: string
-          enum:
-          - asc
-          - desc
-      - name: filter[field][]
-        in: query
-        required: false
-        description: |
-          Additional filter values to narrow the result set. `field` is the name of the
-          indexed field. Repeat the parameter with different values to match any of them
-          (OR logic within the same field).
-
-          Example: `filter[brand][]=Nike&filter[brand][]=Adidas`
-
-          Fields that conflict with the URL pattern filter are silently ignored.
-        schema:
-          type: array
-          items:
+        - name: hashid
+          in: path
+          required: true
+          description: Search Engine ID (also known as hashid).
+          schema:
             type: string
-      - name: exclude[field][]
-        in: query
-        required: false
-        description: |
-          Exclude items with these field values from the results. `field` is the name of
-          the indexed field. Repeat the parameter to exclude multiple values.
+            example: abc1234de
+        - name: url
+          in: query
+          required: true
+          description: |
+            Full URL of the category page to match against the configured URL patterns.
+            Query string and fragment are stripped before matching.
+          schema:
+            type: string
+            example: https://example.com/categories/shoes.html
+        - name: currency
+          in: query
+          required: false
+          description: |
+            ISO 4217 currency code. When provided, prices are converted to this currency
+            using the exchange rates configured in the search engine.
+          schema:
+            type: string
+            example: EUR
+        - name: page
+          in: query
+          required: false
+          description: Page number (1-indexed). Defaults to `1`.
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            example: 2
+        - name: rpp
+          in: query
+          required: false
+          description: Number of results per page. Defaults to `50`.
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            example: 24
+        - name: "sort[N][field]"
+          in: query
+          required: false
+          description: |
+            Sort criteria in indexed map format. `N` is a 0-based integer that defines the
+            sort priority. `field` is the name of the field to sort by, and the value is the
+            direction (`asc` or `desc`).
 
-          Example: `exclude[dfid][]=abc123&exclude[dfid][]=def456`
-        schema:
-          type: array
-          items:
+            Example: `sort[0][price]=asc&sort[1][brand]=desc` sorts first by price ascending,
+            then by brand descending.
+
+            If omitted, the sort configured in the category page settings is used.
+          schema:
             type: string
-      - name: results_personalization_dfids[]
-        in: query
-        required: false
-        description: |
-          List of Doofinder item IDs (`dfid`) representing items the user has recently
-          interacted with. When provided, results are reordered to surface contextually
-          relevant items.
-        schema:
-          type: array
-          items:
-            type: string
-          example:
-          - abc1234de@product@a1b2c3
-          - abc1234de@product@d4e5f6
+            enum:
+              - asc
+              - desc
+        - name: "filter[field][]"
+          in: query
+          required: false
+          description: |
+            Additional filter values to narrow the result set. `field` is the name of the
+            indexed field. Repeat the parameter with different values to match any of them
+            (OR logic within the same field).
+
+            Example: `filter[brand][]=Nike&filter[brand][]=Adidas`
+
+            Fields that conflict with the URL pattern filter are silently ignored.
+          schema:
+            type: array
+            items:
+              type: string
+        - name: "exclude[field][]"
+          in: query
+          required: false
+          description: |
+            Exclude items with these field values from the results. `field` is the name of
+            the indexed field. Repeat the parameter to exclude multiple values.
+
+            Example: `exclude[dfid][]=abc123&exclude[dfid][]=def456`
+          schema:
+            type: array
+            items:
+              type: string
+        - name: "results_personalization_dfids[]"
+          in: query
+          required: false
+          description: |
+            List of Doofinder item IDs (`dfid`) representing items the user has recently
+            interacted with. When provided, results are reordered to surface contextually
+            relevant items.
+          schema:
+            type: array
+            items:
+              type: string
+            example: ["abc1234de@product@a1b2c3", "abc1234de@product@d4e5f6"]
       responses:
         '200':
           description: Search results for the matched category page.
@@ -187,18 +206,18 @@ paths:
                 $ref: '#/components/schemas/CategoryMerchandisingResponse'
               example:
                 results:
-                - dfid: abc1234de@product@a1b2c3
-                  id: SKU-001
-                  title: Running Shoes Model X
-                  price: 99.99
-                  url: https://example.com/products/sku-001
-                  image_url: https://example.com/images/sku-001.jpg
-                - dfid: abc1234de@product@d4e5f6
-                  id: SKU-002
-                  title: Trail Running Shoes Y
-                  price: 129.99
-                  url: https://example.com/products/sku-002
-                  image_url: https://example.com/images/sku-002.jpg
+                  - dfid: abc1234de@product@a1b2c3
+                    id: "SKU-001"
+                    title: "Running Shoes Model X"
+                    price: 99.99
+                    url: https://example.com/products/sku-001
+                    image_url: https://example.com/images/sku-001.jpg
+                  - dfid: abc1234de@product@d4e5f6
+                    id: "SKU-002"
+                    title: "Trail Running Shoes Y"
+                    price: 129.99
+                    url: https://example.com/products/sku-002
+                    image_url: https://example.com/images/sku-002.jpg
                 total: 243
                 page: 1
                 rpp: 50
@@ -206,24 +225,24 @@ paths:
                   brand:
                     _type: terms
                     buckets:
-                    - key: Nike
-                      doc_count: 42
-                    - key: Adidas
-                      doc_count: 38
+                      - key: Nike
+                        doc_count: 42
+                      - key: Adidas
+                        doc_count: 38
                   price:
                     _type: range
                     buckets:
-                    - stats:
-                        min: 9.99
-                        max: 499.99
-                        avg: 89.5
+                      - stats:
+                          min: 9.99
+                          max: 499.99
+                          avg: 89.5
                 base_filter:
-                - field: category
-                  values:
-                  - shoes
+                  - field: category
+                    values:
+                      - shoes
                 filter: []
                 banner:
-                  id: '189523'
+                  id: "189523"
                   image: https://example.com/banners/shoes-banner.jpg
                   mobile_image: https://example.com/banners/shoes-banner-mobile.jpg
                   html_code: null
@@ -236,16 +255,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
-                error: 'missing required param: url'
+                error: "missing required param: url"
         '401':
-          description: Unauthorized — the `Authorization` header is missing, the token is invalid, or the token does not have
-            access to the requested search engine.
+          description: Unauthorized — the `Authorization` header is missing, the token is invalid, or the token does not have access to the requested search engine.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
-                error: Authentication required
+                error: "Authentication required"
         '404':
           description: Not Found — the category page does not exist, is inactive, or no URL pattern matches the provided `url`.
           content:
@@ -253,7 +271,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
-                error: not found
+                error: "not found"
         '502':
           description: Bad Gateway — an upstream search engine error occurred.
           content:
@@ -261,7 +279,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
-                error: bad gateway
+                error: "bad gateway"
+
 components:
   securitySchemes:
     ApiToken:
@@ -269,11 +288,14 @@ components:
       in: header
       name: Authorization
       description: |
-        API token in the format `Token {your_token}`.
+        API token in the format `Token {your_token}`. Required for server-side requests.
+        Browser requests from allowed origins are authenticated automatically via CORS
+        and do not need this token.
 
         ```
         Authorization: Token abc123xyz
         ```
+
   schemas:
     CategoryMerchandisingResponse:
       type: object
@@ -322,6 +344,7 @@ components:
             $ref: '#/components/schemas/AppliedFilter'
         banner:
           $ref: '#/components/schemas/Banner'
+
     Item:
       type: object
       description: |
@@ -337,15 +360,15 @@ components:
         id:
           type: string
           description: Item identifier in the original catalog.
-          example: SKU-001
+          example: "SKU-001"
         title:
           type: string
           description: Item title.
-          example: Running Shoes Model X
+          example: "Running Shoes Model X"
         description:
           type: string
           description: Item description.
-          example: Lightweight running shoes for road and track.
+          example: "Lightweight running shoes for road and track."
         image_url:
           type: string
           description: URL of the item's main image.
@@ -359,19 +382,20 @@ components:
           format: float
           description: Item price in the requested or default currency.
           example: 99.99
+
     Facet:
       description: Aggregation data for a single field. Can be a term facet or a range facet.
       oneOf:
-      - $ref: '#/components/schemas/TermFacet'
-      - $ref: '#/components/schemas/RangeFacet'
+        - $ref: '#/components/schemas/TermFacet'
+        - $ref: '#/components/schemas/RangeFacet'
+
     TermFacet:
       type: object
       description: Facet with discrete term (keyword) values and their document counts.
       properties:
         _type:
           type: string
-          enum:
-          - terms
+          enum: [terms]
           example: terms
         buckets:
           type: array
@@ -386,14 +410,14 @@ components:
                 type: integer
                 description: Number of results with this value.
                 example: 42
+
     RangeFacet:
       type: object
       description: Facet with numeric range statistics (min, max, avg) for the result set.
       properties:
         _type:
           type: string
-          enum:
-          - range
+          enum: [range]
           example: range
         buckets:
           type: array
@@ -415,6 +439,7 @@ components:
                     type: number
                     description: Average value in the result set.
                     example: 89.5
+
     AppliedFilter:
       type: object
       description: A single filter term applied to the search query.
@@ -428,8 +453,8 @@ components:
           description: The values filtered by. Multiple values are combined with OR logic.
           items:
             type: string
-          example:
-          - shoes
+          example: ["shoes"]
+
     Banner:
       type: object
       nullable: true
@@ -440,7 +465,7 @@ components:
         id:
           type: string
           description: Banner identifier.
-          example: '189523'
+          example: "189523"
         image:
           type: string
           nullable: true
@@ -455,7 +480,7 @@ components:
           type: string
           nullable: true
           description: Raw HTML content to render as the banner. When present, takes precedence over `image`.
-          example: <div class='promo-banner'>Summer Sale — Up to 50% off shoes!</div>
+          example: "<div class='promo-banner'>Summer Sale — Up to 50% off shoes!</div>"
         link:
           type: string
           nullable: true
@@ -466,10 +491,11 @@ components:
           nullable: true
           description: Whether the banner link should open in a new browser tab.
           example: true
+
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
           description: Human-readable error message.
-          example: 'missing required param: url'
+          example: "missing required param: url"
