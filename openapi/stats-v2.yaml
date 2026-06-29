@@ -1240,7 +1240,7 @@ info:
   title: Doofinder Stats API
   version: '2.0'
   x-logo:
-    altText: 'Doofinder Search Engine '
+    altText: Doofinder Search Engine
     backgroundColor: '#33268C'
     url: https://admin.doofinder.com/images/logo.svg
 openapi: 3.0.0
@@ -1788,41 +1788,6 @@ paths:
       summary: Inits with users
       tags:
       - Usage & Sessions
-  /api/v2/stats/quizzes:
-    get:
-      description: Gets how many times quizzes have been launched, completed, closed,
-        etc, in a time period, grouped by quiz id.
-      operationId: quizzesStats
-      parameters:
-      - $ref: '#/components/parameters/from'
-      - $ref: '#/components/parameters/to'
-      - $ref: '#/components/parameters/stats_hashids'
-      - $ref: '#/components/parameters/stats_hashid'
-      - $ref: '#/components/parameters/tz'
-      - $ref: '#/components/parameters/format'
-      - $ref: '#/components/parameters/aggregate'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StatsQuizzesResult'
-          description: Stats retrieved.
-        '400':
-          $ref: '#/components/responses/StatsBadRequest'
-        '401':
-          $ref: '#/components/responses/StatsUnauthorized'
-        '403':
-          $ref: '#/components/responses/StatsForbidden'
-        '404':
-          $ref: '#/components/responses/StatsNotFound'
-        '408':
-          $ref: '#/components/responses/StatsTimeout'
-        '429':
-          $ref: '#/components/responses/StatsTooManyRequests'
-      summary: Quizzes
-      tags:
-      - Features
   /api/v2/stats/recommendations:
     get:
       description: Gets how many times recommendations have been displayed and clicked
