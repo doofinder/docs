@@ -3,8 +3,8 @@ info:
   title: Search API
   contact:
     name: Doofinder Support
-    url: https://docs.doofinder.com/
-  version: '6.0'
+    url: "https://docs.doofinder.com/"
+  version: "6.0"
   description: |
     # Introduction
     Search API allows you to perform the search requests you can do on your search
@@ -32,35 +32,35 @@ info:
     - `{token}`: Your personal authentication token obtained in the control panel.
     - `{index}`: The index of the data you're searching at. i.e.: product
     - `{id}`: Unique identification of a resource. i.e.: 1234 or HVIUYC
-  termsOfService: https://www.doofinder.com/es/terms-and-conditions
+  termsOfService: "https://www.doofinder.com/es/terms-and-conditions"
   x-logo:
-    url: https://admin.doofinder.com/images/logo.svg
-    backgroundColor: '#33268C'
-    altText: Doofinder Search Engine
+    url: "https://admin.doofinder.com/images/logo.svg"
+    backgroundColor: "#33268C"
+    altText: "Doofinder Search Engine"
 tags:
-- name: Search
-  description: Search operations.
-- name: Stats
-  description: Stats operations.
+  - name: Search
+    description: Search operations.
+  - name: Session & Events
+    description: Stats operations.
 security:
-- api_token: []
+  - api_token: []
 servers:
-- url: https://{search_zone}-search.doofinder.com
-  variables:
-    search_zone:
-      enum:
-      - eu1
-      - us1
-      - ap1
-      default: eu1
-- url: /
+  - url: https://{search_zone}-search.doofinder.com
+    variables:
+      search_zone:
+        enum:
+          - eu1
+          - us1
+          - ap1
+        default: eu1
+  - url: /
 components:
   securitySchemes:
     api_token:
       type: apiKey
       description: |
-        You can access with an api key created in your Doofinder control panel.
-        You should put a header in the format: Authorization: Token &lt;your token&gt;
+        Doofinder API key. Pass it as:
+        Authorization: Token <api_key>
       name: Authorization
       in: header
   schemas:
@@ -120,7 +120,8 @@ components:
           type: string
     Item:
       title: Item
-      description: A searchable object. Items are the objects that form the search results.
+      description: A searchable object. Items are the objects that form the
+        search results.
       type: object
       properties:
         description:
@@ -142,16 +143,16 @@ components:
           type: string
           description: Item url.
       required:
-      - dfid
-      - id
-      - title
+        - dfid
+        - id
+        - title
       example:
         description: The best product description ever
         dfid: 1234567890abcdef1234567890abcdef@product@1234567890abcdef
         id: my_id
-        image_url: http://www.example.com/images/alt_product_image.jpg
+        image_url: "http://www.example.com/images/alt_product_image.jpg"
         title: My item
-        url: http://www.example.com/alt_product_description.htm
+        url: "http://www.example.com/alt_product_description.htm"
     RangeFacetResponse:
       title: Range Facet Response
       description: |
@@ -185,7 +186,7 @@ components:
       type: object
       properties:
         banner:
-          $ref: '#/components/schemas/BannerResponse'
+          $ref: "#/components/schemas/BannerResponse"
         count:
           description: |
             Total number of items found in the search engine for the searched
@@ -205,16 +206,15 @@ components:
           description: Information about different groupings that can be made for certain fields in the search results.
           items:
             oneOf:
-            - $ref: '#/components/schemas/TermFacetResponse'
-            - $ref: '#/components/schemas/RangeFacetResponse'
+              - $ref: "#/components/schemas/TermFacetResponse"
+              - $ref: "#/components/schemas/RangeFacetResponse"
           type: array
         query_name:
           type: string
-          description: In order to get the best possible results, Doofinder tries several types of querying. This is the type
-            of the query Doofinder made to obtain these results.
+          description: In order to get the best possible results, Doofinder tries several types of querying. This is the type of the query Doofinder made to obtain these results.
         results:
           items:
-            $ref: '#/components/schemas/Item'
+            $ref: "#/components/schemas/Item"
           type: array
         total:
           type: integer
@@ -222,22 +222,22 @@ components:
       example:
         custom_results_id: 5
         facets:
-        - brand:
-            terms:
-              items:
-              - name: Adidas
-                count: 5
-              - name: Nike
-                count: 3
-              selected: []
-        query_name: fuzzy
+          - brand:
+              terms:
+                items:
+                  - name: Adidas
+                    count: 5
+                  - name: Nike
+                    count: 3
+                selected: []
+        query_name: "fuzzy"
         results:
-        - description: The best product description ever
-          dfid: 1234567890abcdef1234567890abcdef@product@1234567890abcdef
-          id: my_id
-          image_url: http://www.example.com/images/alt_product_image.jpg
-          title: My item
-          url: http://www.example.com/alt_product_description.htm
+          - description: The best product description ever
+            dfid: 1234567890abcdef1234567890abcdef@product@1234567890abcdef
+            id: my_id
+            image_url: "http://www.example.com/images/alt_product_image.jpg"
+            title: My item
+            url: "http://www.example.com/alt_product_description.htm"
         total: 1
     StatsResponse:
       title: Stats Response
@@ -256,9 +256,9 @@ components:
       items:
         type: string
       example:
-      - Sugg
-      - Suggest
-      - Suggestion
+        - Sugg
+        - Suggest
+        - Suggestion
     TermFacetResponse:
       title: Term Facet Response
       description: Facet terms search response. Used to aggregate a field by their values.
@@ -298,47 +298,47 @@ components:
       type: object
       properties:
         id:
-          $ref: '#/components/schemas/id'
+          $ref: "#/components/schemas/id"
         index:
-          $ref: '#/components/schemas/index'
+          $ref: "#/components/schemas/index"
         title:
           type: string
           description: The title that describe the item. Usually, the title of item's page.
       required:
-      - id
-      - index
-      - title
+        - id
+        - index
+        - title
     LogCheckoutRequest:
       type: object
       properties:
         session_id:
-          $ref: '#/components/schemas/session_id'
+          $ref: "#/components/schemas/session_id"
         user_id:
-          $ref: '#/components/schemas/user_id'
+          $ref: "#/components/schemas/user_id"
         sources:
-          $ref: '#/components/schemas/checkout_sources'
+          $ref: "#/components/schemas/checkout_sources"
       required:
-      - session_id
+        - session_id
     ClickStatsRequest:
       type: object
       properties:
         custom_results_id:
-          $ref: '#/components/schemas/custom_results_id'
+          $ref: "#/components/schemas/custom_results_id"
         dfid:
-          $ref: '#/components/schemas/Item/properties/dfid'
+          $ref: "#/components/schemas/Item/properties/dfid"
         session_id:
-          $ref: '#/components/schemas/session_id'
+          $ref: "#/components/schemas/session_id"
         user_id:
-          $ref: '#/components/schemas/user_id'
+          $ref: "#/components/schemas/user_id"
         query:
-          $ref: '#/components/schemas/query'
+          $ref: "#/components/schemas/query"
         position:
-          $ref: '#/components/schemas/position'
+          $ref: "#/components/schemas/position"
         resource_id:
-          $ref: '#/components/schemas/resource_id'
+          $ref: "#/components/schemas/resource_id"
       required:
-      - session_id
-      - dfid
+        - session_id
+        - dfid
     ClickBannerRequest:
       type: object
       properties:
@@ -346,21 +346,21 @@ components:
           type: string
           description: The id of the banner clicked
         session_id:
-          $ref: '#/components/schemas/session_id'
+          $ref: "#/components/schemas/session_id"
         query:
-          $ref: '#/components/schemas/query'
+          $ref: "#/components/schemas/query"
       required:
-      - session_id
-      - id
+        - session_id
+        - id
     InitSessionRequest:
       type: object
       properties:
         session_id:
-          $ref: '#/components/schemas/session_id'
+          $ref: "#/components/schemas/session_id"
         user_id:
-          $ref: '#/components/schemas/user_id'
+          $ref: "#/components/schemas/user_id"
       required:
-      - session_id
+        - session_id
     LogRedirectionRequest:
       type: object
       properties:
@@ -368,12 +368,12 @@ components:
           type: string
           description: The id of the redirection triggered
         query:
-          $ref: '#/components/schemas/query'
+          $ref: "#/components/schemas/query"
         session_id:
-          $ref: '#/components/schemas/session_id'
+          $ref: "#/components/schemas/session_id"
       required:
-      - id
-      - session_id
+        - id
+        - session_id
     ImageSearchRequest:
       type: object
       properties:
@@ -383,7 +383,7 @@ components:
           description: Image encoded in base64.
           example: iVBORw0KGgoAAAANSUhEUgAAAboAAAC7CAYAAAAT...
       required:
-      - image
+        - image
     SearchRequest:
       type: object
       description: Search parameters sent as a JSON body. All fields are optional.
@@ -424,14 +424,10 @@ components:
                 type: integer
               type:
                 type: string
-                enum:
-                - term
-                - range
+                enum: [term, range]
         filter_execution:
           type: string
-          enum:
-          - and
-          - or
+          enum: ["and", "or"]
           description: Boolean logic applied to filters. Default is "and".
         sort:
           type: array
@@ -444,27 +440,24 @@ components:
               type: string
         query_name:
           type: string
-          enum:
-          - match_and
-          - match_or
-          - fuzzy
+          enum: [match_and, match_or, fuzzy]
           description: Force a specific query type.
         session_id:
-          $ref: '#/components/schemas/session_id'
+          $ref: "#/components/schemas/session_id"
         user_id:
-          $ref: '#/components/schemas/user_id'
+          $ref: "#/components/schemas/user_id"
         stats:
           type: boolean
-          description: 'Enable/Disable this search in stats reports. Default: true'
+          description: "Enable/Disable this search in stats reports. Default: true"
         auto_filters:
           type: boolean
-          description: 'Enable/Disable auto filters feature. Default: false'
+          description: "Enable/Disable auto filters feature. Default: false"
         custom_results:
           type: boolean
-          description: 'Enable/Disable custom results feature. Default: true'
+          description: "Enable/Disable custom results feature. Default: true"
         excluded_results:
           type: boolean
-          description: 'Enable/Disable excluded items feature. Default: true'
+          description: "Enable/Disable excluded items feature. Default: true"
         grouping:
           type: boolean
           description: Enable/Disable grouping of variants as single items.
@@ -487,10 +480,10 @@ components:
           description: Fields to exclude from top_facet processing.
         title_facet:
           type: boolean
-          description: 'Enable/Disable title_facet feature. Default: false'
+          description: "Enable/Disable title_facet feature. Default: false"
         top_facet:
           type: boolean
-          description: 'Enable/Disable top_facet feature. Default: false'
+          description: "Enable/Disable top_facet feature. Default: false"
     ErrorResponse:
       type: object
       description: Standard error response returned on all non-200 outcomes.
@@ -499,8 +492,10 @@ components:
           type: string
           description: Human-readable error message.
       required:
-      - error
+        - error
+
   parameters:
+    # Path parameters
     hashid:
       name: hashid
       in: path
@@ -514,29 +509,30 @@ components:
       description: The current session ID, must be unique for each user.
       required: true
       schema:
-        $ref: '#/components/schemas/session_id'
+        $ref: "#/components/schemas/session_id"
+    # Query parameters
     session_id_query:
       name: session_id
       in: query
       description: The current session ID, must be unique for each user.
       schema:
-        $ref: '#/components/schemas/session_id'
+        $ref: "#/components/schemas/session_id"
     user_id_query:
       name: user_id
       in: query
       description: Identifies the user, must be unique for each user.
       schema:
-        $ref: '#/components/schemas/user_id'
+        $ref: "#/components/schemas/user_id"
     auto_filters:
       name: auto_filters
       in: query
-      description: 'Enable/Disable auto filters feature in search. Default: false'
+      description: "Enable/Disable auto filters feature in search. Default: false"
       schema:
         type: boolean
     custom_results:
       name: custom_results
       in: query
-      description: 'Enable/Disable custom_results feature in search. Default: true'
+      description: "Enable/Disable custom_results feature in search. Default: true"
       schema:
         type: boolean
     dfid:
@@ -552,7 +548,7 @@ components:
     excluded_results:
       name: excluded_results
       in: query
-      description: 'Enable/Disable excluded items feature in the search. Default: true'
+      description: "Enable/Disable excluded items feature in the search. Default: true"
       schema:
         type: boolean
     exclude:
@@ -589,7 +585,7 @@ components:
     exclude_self:
       name: exclude_self
       in: query
-      description: 'Exclude the item being searched from the results. Default: true'
+      description: "Exclude the item being searched from the results. Default: true"
       schema:
         type: boolean
     facets:
@@ -657,8 +653,8 @@ components:
       schema:
         type: string
         enum:
-        - and
-        - or
+          - "and"
+          - "or"
     grouping:
       name: grouping
       in: query
@@ -731,9 +727,9 @@ components:
       schema:
         type: string
         enum:
-        - match_and
-        - match_or
-        - fuzzy
+          - match_and
+          - match_or
+          - fuzzy
     rpp:
       name: rpp
       in: query
@@ -745,7 +741,7 @@ components:
     stats:
       name: stats
       in: query
-      description: 'Enable/Disable this search in stats reports. Default: true'
+      description: "Enable/Disable this search in stats reports. Default: true"
       schema:
         type: boolean
     skip_auto_filters:
@@ -791,13 +787,13 @@ components:
     title_facet:
       name: title_facet
       in: query
-      description: 'Enable/Disable title_facet feature. Default: false'
+      description: "Enable/Disable title_facet feature. Default: false"
       schema:
         type: boolean
     top_facet:
       name: top_facet
       in: query
-      description: 'Enable/Disable top_facet feature. Default: false'
+      description: "Enable/Disable top_facet feature. Default: false"
       schema:
         type: boolean
     fields:
@@ -810,51 +806,51 @@ components:
         items:
           type: string
 paths:
+  # Search endpoints
   /6/{hashid}/_search:
     get:
       tags:
-      - Search
+        - Search
       summary: Search query
       description: Search through indexed items of a search engine.
       operationId: search_query
       parameters:
-      - $ref: '#/components/parameters/hashid'
-      - $ref: '#/components/parameters/auto_filters'
-      - $ref: '#/components/parameters/custom_results'
-      - $ref: '#/components/parameters/excluded_results'
-      - $ref: '#/components/parameters/exclude'
-      - $ref: '#/components/parameters/facets'
-      - $ref: '#/components/parameters/filter'
-      - $ref: '#/components/parameters/filter_execution'
-      - $ref: '#/components/parameters/grouping'
-      - $ref: '#/components/parameters/with_variants'
-      - $ref: '#/components/parameters/indices'
-      - $ref: '#/components/parameters/page'
-      - $ref: '#/components/parameters/query'
-      - $ref: '#/components/parameters/query_name'
-      - $ref: '#/components/parameters/rpp'
-      - $ref: '#/components/parameters/session_id_query'
-      - $ref: '#/components/parameters/user_id_query'
-      - $ref: '#/components/parameters/stats'
-      - $ref: '#/components/parameters/skip_auto_filters'
-      - $ref: '#/components/parameters/skip_top_facet'
-      - $ref: '#/components/parameters/sort'
-      - $ref: '#/components/parameters/title_facet'
-      - $ref: '#/components/parameters/top_facet'
+        - $ref: "#/components/parameters/hashid"
+        - $ref: "#/components/parameters/auto_filters"
+        - $ref: "#/components/parameters/custom_results"
+        - $ref: "#/components/parameters/excluded_results"
+        - $ref: "#/components/parameters/exclude"
+        - $ref: "#/components/parameters/facets"
+        - $ref: "#/components/parameters/filter"
+        - $ref: "#/components/parameters/filter_execution"
+        - $ref: "#/components/parameters/grouping"
+        - $ref: "#/components/parameters/with_variants"
+        - $ref: "#/components/parameters/indices"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/query"
+        - $ref: "#/components/parameters/query_name"
+        - $ref: "#/components/parameters/rpp"
+        - $ref: "#/components/parameters/session_id_query"
+        - $ref: "#/components/parameters/user_id_query"
+        - $ref: "#/components/parameters/stats"
+        - $ref: "#/components/parameters/skip_auto_filters"
+        - $ref: "#/components/parameters/skip_top_facet"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/title_facet"
+        - $ref: "#/components/parameters/top_facet"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResponse'
-        '400': &id002
-          description: Bad Request — invalid query parameters (invalid rpp, page, query_name, sort, filter_execution, session_id,
-            or user_id).
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
+          description: Bad Request — invalid query parameters (invalid rpp, page, query_name, sort, filter_execution, session_id, or user_id).
           content:
             application/json:
-              schema: &id001
-                $ref: '#/components/schemas/ErrorResponse'
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 invalid_query:
                   summary: Bad query value
@@ -868,11 +864,12 @@ paths:
                   summary: Invalid rpp
                   value:
                     error: Invalid rpp
-        '403': &id003
+        "403":
           description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 forbidden:
                   summary: Missing or invalid API token
@@ -882,18 +879,19 @@ paths:
                   summary: Client IP is blocked
                   value:
                     error: banned ip
-        '404': &id004
+        "404":
           description: Not Found — search engine mapping does not exist.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 summary: Mapping not found
                 value:
                   error: Mapping not found
     post:
       tags:
-      - Search
+        - Search
       summary: Search query (POST)
       description: |
         Search through indexed items of a search engine.
@@ -902,26 +900,67 @@ paths:
         complex nested structures (filters, facets, sort).
       operationId: search_query_post
       parameters:
-      - $ref: '#/components/parameters/hashid'
+        - $ref: "#/components/parameters/hashid"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchRequest'
+              $ref: "#/components/schemas/SearchRequest"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResponse'
-        '400': *id002
-        '403': *id003
-        '404': *id004
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
+          description: Bad Request — invalid query parameters (invalid rpp, page, query_name, sort, filter_execution, session_id, or user_id).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalid_query:
+                  summary: Bad query value
+                  value:
+                    error: Bad request, bad query
+                invalid_session_id:
+                  summary: session_id too long
+                  value:
+                    error: session_id should have 32 characters or less
+                invalid_rpp:
+                  summary: Invalid rpp
+                  value:
+                    error: Invalid rpp
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
+        "404":
+          description: Not Found — search engine mapping does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                summary: Mapping not found
+                value:
+                  error: Mapping not found
   /6/{hashid}/_image_search:
     post:
       tags:
-      - Search
+        - Search
       summary: Image Search
       description: Search through indexed images of a search engine.
       operationId: image_search_query
@@ -929,32 +968,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImageSearchRequest'
+              $ref: "#/components/schemas/ImageSearchRequest"
       parameters:
-      - $ref: '#/components/parameters/exclude'
-      - $ref: '#/components/parameters/excluded_results'
-      - $ref: '#/components/parameters/facets'
-      - $ref: '#/components/parameters/filter'
-      - $ref: '#/components/parameters/filter_execution'
-      - $ref: '#/components/parameters/hashid'
-      - $ref: '#/components/parameters/rpp'
-      - $ref: '#/components/parameters/session_id_query'
-      - $ref: '#/components/parameters/user_id_query'
-      - $ref: '#/components/parameters/stats'
-      - $ref: '#/components/parameters/sort'
+        - $ref: "#/components/parameters/exclude"
+        - $ref: "#/components/parameters/excluded_results"
+        - $ref: "#/components/parameters/facets"
+        - $ref: "#/components/parameters/filter"
+        - $ref: "#/components/parameters/filter_execution"
+        - $ref: "#/components/parameters/hashid"
+        - $ref: "#/components/parameters/rpp"
+        - $ref: "#/components/parameters/session_id_query"
+        - $ref: "#/components/parameters/user_id_query"
+        - $ref: "#/components/parameters/stats"
+        - $ref: "#/components/parameters/sort"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResponse'
-        '400':
-          description: Bad Request — `image` field missing, invalid `rpp`, or image search is not enabled for this search
-            engine.
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
+          description: Bad Request — `image` field missing, invalid `rpp`, or image search is not enabled for this search engine.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 missing_image:
                   summary: image field missing
@@ -968,13 +1007,37 @@ paths:
                   summary: Invalid rpp value
                   value:
                     error: Invalid rpp
-        '403': *id003
-        '404': *id004
-        '424':
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
+        "404":
+          description: Not Found — search engine mapping does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                summary: Mapping not found
+                value:
+                  error: Mapping not found
+        "424":
           description: Failed Dependency — the image embedding service returned an error. Retry the request.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 summary: Image embedding failed
                 value:
@@ -982,29 +1045,30 @@ paths:
   /6/{hashid}/_suggest:
     get:
       tags:
-      - Search
+        - Search
       summary: Suggestions
       description: Search through indexed suggestions of a search engine.
       operationId: suggestion_query
       parameters:
-      - $ref: '#/components/parameters/hashid'
-      - $ref: '#/components/parameters/indices'
-      - $ref: '#/components/parameters/query'
-      - $ref: '#/components/parameters/session_id_query'
-      - $ref: '#/components/parameters/user_id_query'
-      - $ref: '#/components/parameters/stats'
+        - $ref: "#/components/parameters/hashid"
+        - $ref: "#/components/parameters/indices"
+        - $ref: "#/components/parameters/query"
+        - $ref: "#/components/parameters/session_id_query"
+        - $ref: "#/components/parameters/user_id_query"
+        - $ref: "#/components/parameters/stats"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuggestionsResponse'
-        '400':
+                $ref: "#/components/schemas/SuggestionsResponse"
+        "400":
           description: Bad Request — query exceeds 200 characters or 10 words, or session_id/user_id too long.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 invalid_query:
                   summary: Query too long or too many words
@@ -1014,12 +1078,27 @@ paths:
                   summary: session_id too long
                   value:
                     error: session_id should have 32 characters or less
-        '403': *id003
-        '404':
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
+        "404":
           description: Not Found — search engine mapping not found, or the requested index does not exist.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 mapping_not_found:
                   summary: Mapping not found
@@ -1029,11 +1108,12 @@ paths:
                   summary: Requested index does not exist
                   value:
                     error: Index product not found.
-        '429':
+        "429":
           description: Too Many Requests — suggestions are not enabled for this search engine.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 summary: Suggestions not enabled
                 value:
@@ -1041,37 +1121,38 @@ paths:
   /6/{hashid}/_visually_similar:
     get:
       tags:
-      - Search
+        - Search
       summary: Visually Similar
       description: Search for elements visually similar to the given dfid.
       operationId: visually_similar_query
       parameters:
-      - $ref: '#/components/parameters/dfid'
-      - $ref: '#/components/parameters/exclude'
-      - $ref: '#/components/parameters/exclude_self'
-      - $ref: '#/components/parameters/excluded_results'
-      - $ref: '#/components/parameters/facets'
-      - $ref: '#/components/parameters/filter'
-      - $ref: '#/components/parameters/filter_execution'
-      - $ref: '#/components/parameters/hashid'
-      - $ref: '#/components/parameters/rpp'
-      - $ref: '#/components/parameters/session_id_query'
-      - $ref: '#/components/parameters/user_id_query'
-      - $ref: '#/components/parameters/stats'
-      - $ref: '#/components/parameters/fields'
-      - $ref: '#/components/parameters/sort'
+        - $ref: "#/components/parameters/dfid"
+        - $ref: "#/components/parameters/exclude"
+        - $ref: "#/components/parameters/exclude_self"
+        - $ref: "#/components/parameters/excluded_results"
+        - $ref: "#/components/parameters/facets"
+        - $ref: "#/components/parameters/filter"
+        - $ref: "#/components/parameters/filter_execution"
+        - $ref: "#/components/parameters/hashid"
+        - $ref: "#/components/parameters/rpp"
+        - $ref: "#/components/parameters/session_id_query"
+        - $ref: "#/components/parameters/user_id_query"
+        - $ref: "#/components/parameters/stats"
+        - $ref: "#/components/parameters/fields"
+        - $ref: "#/components/parameters/sort"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResponse'
-        '400':
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
           description: Bad Request — `dfid` missing, invalid `rpp`, or image search not enabled for this search engine.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 missing_dfid:
                   summary: dfid missing
@@ -1081,12 +1162,27 @@ paths:
                   summary: Feature not enabled
                   value:
                     error: Image Search is not enabled for this search engine
-        '403': *id003
-        '404':
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
+        "404":
           description: Not Found — mapping not found, the dfid has no indexed image, or the image index is unavailable.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 mapping_not_found:
                   summary: Mapping not found
@@ -1100,10 +1196,11 @@ paths:
                   summary: Image index not available
                   value:
                     error: Image index is not available
+  # Stats endpoints
   /6/{hashid}/stats/cart/{session_id}:
     put:
       tags:
-      - Stats
+        - Session & Events
       summary: Add to cart
       description: |
         Registers a click event on the cart.
@@ -1112,23 +1209,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddToCartClickRequest'
+              $ref: "#/components/schemas/AddToCartClickRequest"
       parameters:
-      - $ref: '#/components/parameters/hashid'
-      - $ref: '#/components/parameters/session_id_path'
+        - $ref: "#/components/parameters/hashid"
+        - $ref: "#/components/parameters/session_id_path"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatsResponse'
-        '400':
-          description: Bad Request — missing required cart item fields (id, index, title), session_id exceeds 32 characters,
-            or invalid cart item data.
+                $ref: "#/components/schemas/StatsResponse"
+        "400":
+          description: Bad Request — missing required cart item fields (id, index, title), session_id exceeds 32 characters, or invalid cart item data.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 missing_fields:
                   summary: Required cart item fields missing
@@ -1142,12 +1239,26 @@ paths:
                   summary: Invalid cart item data
                   value:
                     error: Invalid cart item data
-        '403': *id003
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
   /6/{hashid}/stats/checkout:
     put:
       deprecated: true
       tags:
-      - Stats
+        - Session & Events
       summary: Logs a checkout
       description: |
         Logs a checkout event in stats logs. That is the event for when a
@@ -1158,22 +1269,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LogCheckoutRequest'
+              $ref: "#/components/schemas/LogCheckoutRequest"
       parameters:
-      - $ref: '#/components/parameters/hashid'
+        - $ref: "#/components/parameters/hashid"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatsResponse'
-        '400':
-          description: Bad Request — session_id exceeds 32 characters, user_id exceeds 36 characters, or other validation
-            failure.
+                $ref: "#/components/schemas/StatsResponse"
+        "400":
+          description: Bad Request — session_id exceeds 32 characters, user_id exceeds 36 characters, or other validation failure.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 invalid_session_id:
                   summary: session_id too long
@@ -1187,11 +1298,25 @@ paths:
                   summary: Generic validation failure
                   value:
                     error: Bad request
-        '403': *id003
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
   /6/{hashid}/stats/click:
     put:
       tags:
-      - Stats
+        - Session & Events
       summary: Click stats
       description: Save click event on doofinder statistics
       operationId: click_stats
@@ -1199,22 +1324,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClickStatsRequest'
+              $ref: "#/components/schemas/ClickStatsRequest"
       parameters:
-      - $ref: '#/components/parameters/hashid'
+        - $ref: "#/components/parameters/hashid"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatsResponse'
-        '400':
-          description: Bad Request — missing required fields (dfid, session_id), invalid dfid format, dfid belongs to a different
-            search engine, or invalid position.
+                $ref: "#/components/schemas/StatsResponse"
+        "400":
+          description: Bad Request — missing required fields (dfid, session_id), invalid dfid format, dfid belongs to a different search engine, or invalid position.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 missing_fields:
                   summary: Required fields missing
@@ -1232,12 +1357,27 @@ paths:
                   summary: session_id too long
                   value:
                     error: session_id should have 32 characters or less
-        '403': *id003
-        '404':
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
+        "404":
           description: Not Found — the item referenced by `dfid` does not exist in this search engine.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 summary: Item not found
                 value:
@@ -1245,7 +1385,7 @@ paths:
   /6/{hashid}/stats/image:
     put:
       tags:
-      - Stats
+        - Session & Events
       summary: Logs a banner image click
       description: Logs a "click on banner image" event in stats logs.
       operationId: banner_stats
@@ -1253,21 +1393,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClickBannerRequest'
+              $ref: "#/components/schemas/ClickBannerRequest"
       parameters:
-      - $ref: '#/components/parameters/hashid'
+        - $ref: "#/components/parameters/hashid"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatsResponse'
-        '400':
+                $ref: "#/components/schemas/StatsResponse"
+        "400":
           description: Bad Request — missing required fields (id, session_id) or banner id is not numeric.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 missing_fields:
                   summary: Required fields missing
@@ -1277,11 +1418,25 @@ paths:
                   summary: Banner id is not numeric
                   value:
                     error: Invalid redirect id
-        '403': *id003
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
   /6/{hashid}/stats/init:
     put:
       tags:
-      - Stats
+        - Session & Events
       summary: Init session
       description: |
         Starts a session identified by a session_id. The session is used to
@@ -1292,21 +1447,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InitSessionRequest'
+              $ref: "#/components/schemas/InitSessionRequest"
       parameters:
-      - $ref: '#/components/parameters/hashid'
+        - $ref: "#/components/parameters/hashid"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatsResponse'
-        '400':
+                $ref: "#/components/schemas/StatsResponse"
+        "400":
           description: Bad Request — session_id missing or exceeds 32 characters; user_id exceeds 36 characters.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 missing_session_id:
                   summary: session_id missing
@@ -1320,11 +1476,25 @@ paths:
                   summary: user_id too long
                   value:
                     error: invalid_user_id
-        '403': *id003
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
   /6/{hashid}/stats/redirect:
     put:
       tags:
-      - Stats
+        - Session & Events
       summary: Logs a redirection
       description: Logs a "redirection triggered" event in stats logs.
       operationId: redirect_stats
@@ -1332,21 +1502,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LogRedirectionRequest'
+              $ref: "#/components/schemas/LogRedirectionRequest"
       parameters:
-      - $ref: '#/components/parameters/hashid'
+        - $ref: "#/components/parameters/hashid"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatsResponse'
-        '400':
+                $ref: "#/components/schemas/StatsResponse"
+        "400":
           description: Bad Request — missing required fields (session_id, id) or redirect id is not numeric.
           content:
             application/json:
-              schema: *id001
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 missing_fields:
                   summary: Required fields missing
@@ -1356,4 +1527,18 @@ paths:
                   summary: Redirect id is not numeric
                   value:
                     error: Invalid redirect id
-        '403': *id003
+        "403":
+          description: Forbidden — missing or invalid API token, client IP is blocked, or CORS `Origin` not allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                forbidden:
+                  summary: Missing or invalid API token
+                  value:
+                    error: forbidden
+                banned_ip:
+                  summary: Client IP is blocked
+                  value:
+                    error: banned ip
