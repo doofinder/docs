@@ -184,64 +184,9 @@
             ]
           },
           {
-            "group": "Usage & Sessions",
+            "group": "Endpoints",
             "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/inits",
-              "GET /api/v2/stats/inits/locations",
-              "GET /api/v2/stats/inits/users",
-              "GET /api/v2/stats/usage",
-              "GET /api/v2/stats/search_engine_users"
-            ]
-          },
-          {
-            "group": "Searches",
-            "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/searches",
-              "GET /api/v2/stats/searches/top",
-              "GET /api/v2/stats/searches/popular",
-              "GET /api/v2/stats/searches/locations",
-              "GET /api/v2/stats/results/top"
-            ]
-          },
-          {
-            "group": "Clicks & Interactions",
-            "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/clicks",
-              "GET /api/v2/stats/clicks/users",
-              "GET /api/v2/stats/clicked_items",
-              "GET /api/v2/stats/clicked_items/searches",
-              "GET /api/v2/stats/clicked_items/position",
-              "GET /api/v2/stats/redirects"
-            ]
-          },
-          {
-            "group": "Conversions & Sales",
-            "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/checkouts",
-              "GET /api/v2/stats/sales",
-              "POST /api/v2/stats/sales",
-              "GET /api/v2/stats/top-sales",
-              "POST /api/v2/stats/carts"
-            ]
-          },
-          {
-            "group": "Features",
-            "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/banners",
-              "GET /api/v2/stats/facets",
-              "GET /api/v2/stats/facets_by_day",
-              "GET /api/v2/stats/facets/top",
-              "GET /api/v2/stats/custom-results",
-              "GET /api/v2/stats/recommendations",
-              "GET /api/v2/stats/quizzes",
-              "GET /api/v2/stats/sector/{name}",
-              "POST /api/v2/stats/visit"
-            ]
+            "pages": []
           }
         ]
       },
