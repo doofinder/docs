@@ -135,7 +135,7 @@
             ]
           },
           {
-            "group": "Search",
+            "group": "Search ",
             "openapi": "openapi/search-v6.yaml",
             "pages": [
               "GET /6/{hashid}/_search",
