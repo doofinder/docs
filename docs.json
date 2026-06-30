@@ -135,26 +135,9 @@
             ]
           },
           {
-            "group": "Search",
+            "group": "Endpoints",
             "openapi": "openapi/search-v6.yaml",
-            "pages": [
-              "GET /6/{hashid}/_search",
-              "POST /6/{hashid}/_search",
-              "GET /6/{hashid}/_suggest",
-              "POST /6/{hashid}/_image_search",
-              "GET /6/{hashid}/_visually_similar"
-            ]
-          },
-          {
-            "group": "Session & Events",
-            "openapi": "openapi/search-v6.yaml",
-            "pages": [
-              "PUT /6/{hashid}/stats/init",
-              "PUT /6/{hashid}/stats/click",
-              "PUT /6/{hashid}/stats/cart/{session_id}",
-              "PUT /6/{hashid}/stats/redirect",
-              "PUT /6/{hashid}/stats/image"
-            ]
+            "pages": []
           }
         ]
       },
@@ -184,64 +167,9 @@
             ]
           },
           {
-            "group": "Usage & Sessions",
+            "group": "Endpoints",
             "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/inits",
-              "GET /api/v2/stats/inits/locations",
-              "GET /api/v2/stats/inits/users",
-              "GET /api/v2/stats/usage",
-              "GET /api/v2/stats/search_engine_users"
-            ]
-          },
-          {
-            "group": "Searches",
-            "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/searches",
-              "GET /api/v2/stats/searches/top",
-              "GET /api/v2/stats/searches/popular",
-              "GET /api/v2/stats/searches/locations",
-              "GET /api/v2/stats/results/top"
-            ]
-          },
-          {
-            "group": "Clicks & Interactions",
-            "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/clicks",
-              "GET /api/v2/stats/clicks/users",
-              "GET /api/v2/stats/clicked_items",
-              "GET /api/v2/stats/clicked_items/searches",
-              "GET /api/v2/stats/clicked_items/position",
-              "GET /api/v2/stats/redirects"
-            ]
-          },
-          {
-            "group": "Conversions & Sales",
-            "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/checkouts",
-              "GET /api/v2/stats/sales",
-              "POST /api/v2/stats/sales",
-              "GET /api/v2/stats/top-sales",
-              "POST /api/v2/stats/carts"
-            ]
-          },
-          {
-            "group": "Features",
-            "openapi": "openapi/stats-v2.yaml",
-            "pages": [
-              "GET /api/v2/stats/banners",
-              "GET /api/v2/stats/facets",
-              "GET /api/v2/stats/facets_by_day",
-              "GET /api/v2/stats/facets/top",
-              "GET /api/v2/stats/custom-results",
-              "GET /api/v2/stats/recommendations",
-              "GET /api/v2/stats/quizzes",
-              "GET /api/v2/stats/sector/{name}",
-              "POST /api/v2/stats/visit"
-            ]
+            "pages": []
           }
         ]
       },
@@ -257,9 +185,7 @@
           {
             "group": "Endpoints",
             "openapi": "openapi/recommendations-v1.yaml",
-            "pages": [
-              "POST /api/widget/{widget_id}"
-            ]
+            "pages": []
           }
         ]
       },
@@ -275,9 +201,7 @@
           {
             "group": "Endpoints",
             "openapi": "openapi/category-merchandising-v1.yaml",
-            "pages": [
-              "GET /category_merchandising/{hashid}"
-            ]
+            "pages": []
           }
         ]
       }
