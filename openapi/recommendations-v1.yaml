@@ -211,6 +211,222 @@ paths:
                   error:
                     type: string
                     example: "Too many request"
+  /api/widget/{widget_id}/click:
+    post:
+      tags: ["Recommendations"]
+      summary: Register a widget click
+      description: Registers a click event on a product recommended by a specific widget
+      operationId: registerWidgetClick
+      parameters:
+        - name: widget_id
+          in: path
+          required: true
+          description: Unique identifier for the widget
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClickRequest'
+      responses:
+        '200':
+          description: Click registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+        '400':
+          description: Bad Request - Missing required parameters or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                      - "Forbidden origin"
+                      - "Forbidden ip"
+                example:
+                  error: "Forbidden origin"
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '429':
+          description: Too Many Requests - Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Too many request"
+  /api/widget/{widget_id}/cart:
+    post:
+      tags: ["Recommendations"]
+      summary: Register an add-to-cart event
+      description: Registers that a product recommended by a specific widget was added to the cart
+      operationId: registerWidgetAddToCart
+      parameters:
+        - name: widget_id
+          in: path
+          required: true
+          description: Unique identifier for the widget
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequest'
+      responses:
+        '200':
+          description: Add-to-cart event processed, check the status field for the outcome
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: ["OK", "ERROR"]
+                    example: "OK"
+        '400':
+          description: Bad Request - Missing required parameters or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                      - "Forbidden origin"
+                      - "Forbidden ip"
+                example:
+                  error: "Forbidden origin"
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '429':
+          description: Too Many Requests - Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Too many request"
+  /api/widget/{widget_id}/item:
+    get:
+      tags: ["Recommendations"]
+      summary: Get item details
+      description: Retrieves details for a single product identified by its dfid, in the context of a specific widget's search engine
+      operationId: getWidgetItem
+      parameters:
+        - name: widget_id
+          in: path
+          required: true
+          description: Unique identifier for the widget
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+        - name: dfid
+          in: query
+          required: true
+          description: Doofinder's unique ID for the item
+          schema:
+            type: string
+            example: "123e4567e89b12d3a456426614174000@product@e7b7a6c35b2d4afc94991bfc8100227a"
+        - name: price_name
+          in: query
+          required: false
+          description: Currency code used to select the item's price field (optional)
+          schema:
+            type: string
+            example: "EUR"
+      responses:
+        '200':
+          description: Item found, or lookup failed upstream (see response shape)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    description: The item data
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "ERROR"
+        '400':
+          description: Bad Request - Missing required parameters or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                      - "Forbidden origin"
+                      - "Forbidden ip"
+                example:
+                  error: "Forbidden origin"
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '429':
+          description: Too Many Requests - Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Too many request"
 components:
   schemas:
     ErrorResponse:
@@ -350,3 +566,64 @@ components:
           description: Doofinder's unique ID for the item
       example:
         dfid: "123e4567e89b12d3a456426614174000@product@e7b7a6c35b2d4afc94991bfc8100227a"
+    ClickRequest:
+      type: object
+      required:
+        - hashid
+        - dfid
+        - session_id
+        - user_id
+      properties:
+        hashid:
+          type: string
+          description: Hash identifier for the search engine
+          example: "de8f052ea612f95b6950d4013dd6ef38"
+        dfid:
+          type: string
+          description: Doofinder's unique ID for the clicked item
+          example: "123e4567e89b12d3a456426614174000@product@e7b7a6c35b2d4afc94991bfc8100227a"
+        session_id:
+          type: string
+          description: Session identifier for tracking user behavior
+          example: "b2b89619844f4eb0b5fa19f28a19d679"
+        user_id:
+          type: string
+          description: Unique user identifier
+          example: "8c80694b-354c-4533-acd1-e4b8e7d74b7b"
+        position:
+          type: integer
+          description: Position of the item within the recommendation results (optional, default 0)
+          example: 0
+        title:
+          type: string
+          description: The product title (optional)
+        link:
+          type: string
+          description: The product link (optional)
+    AddToCartRequest:
+      type: object
+      required:
+        - session_id
+        - dfid
+        - title
+        - price
+      properties:
+        session_id:
+          type: string
+          description: Session identifier for tracking user behavior
+          example: "b2b89619844f4eb0b5fa19f28a19d679"
+        dfid:
+          type: string
+          description: Doofinder's unique ID for the item added to the cart
+          example: "123e4567e89b12d3a456426614174000@product@e7b7a6c35b2d4afc94991bfc8100227a"
+        title:
+          type: string
+          description: The item title
+        amount:
+          type: integer
+          description: Quantity added to the cart (optional, default 1)
+          example: 1
+        price:
+          type: number
+          format: float
+          description: The item price
