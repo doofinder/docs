@@ -2418,7 +2418,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchEngine'
+              allOf:
+                - $ref: '#/components/schemas/SearchEngine'
+                - type: object
+                  properties:
+                    store_id: {}
+                  required:
+                    - store_id
         required: true
       responses:
         '201':
