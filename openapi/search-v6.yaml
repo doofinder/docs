@@ -58,11 +58,13 @@ components:
   securitySchemes:
     api_token:
       type: apiKey
-      description: |
-        Doofinder API key. Pass it as:
-        Authorization: Token <api_key>
       name: Authorization
       in: header
+      description: |
+        Doofinder API key. The `Token` prefix is part of the header value, so enter it too — the field is sent verbatim as:
+
+            Authorization: Token <api_key>
+      x-default: Token <your_api_key>
   schemas:
     session_id:
       type: string
