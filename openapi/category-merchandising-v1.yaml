@@ -295,6 +295,7 @@ components:
         ```
         Authorization: Token abc123xyz
         ```
+      x-default: Token <your_token>
 
   schemas:
     CategoryMerchandisingResponse:
