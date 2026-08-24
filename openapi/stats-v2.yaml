@@ -1021,24 +1021,21 @@ components:
         total_count: 1
   securitySchemes:
     api_token:
-      description: 'Doofinder API key. Pass it as:
-
-        Authorization: Token <api_key>
-
-        '
+      description: "Doofinder API key. The `Token` prefix is part of the header value,\
+        \ so enter it too — the field is sent verbatim as:\n\n    Authorization: Token\
+        \ <api_key>\n"
       in: header
       name: Authorization
       type: apiKey
+      x-default: Token <your_api_key>
     jwt_token:
-      description: 'JWT Bearer token. Sign a JWT with your API key (HS256) and pass
-        it as:
-
-        Authorization: Bearer <jwt_token>
-
-        '
+      description: "JWT signed with your API key (HS256). The `Bearer` prefix is part\
+        \ of the header value, so enter it too — the field is sent verbatim as:\n\n\
+        \    Authorization: Bearer <jwt_token>\n"
       in: header
       name: Authorization
       type: apiKey
+      x-default: Bearer <your_jwt_token>
 info:
   contact:
     name: Doofinder Support
