@@ -549,12 +549,10 @@ components:
                   example: "https://mydomain.com/feed"
             - title: Magento2 Source Options
               description:
-                Required parameters to access a `magento2` source. It is the API
-                base URL, the access token isn't specified here.
+                Required parameters to access a `magento2` source.
               type: object
               required:
                 - feed_type
-                - url
               properties:
                 feed_type:
                   description:
@@ -564,11 +562,6 @@ components:
                     - product
                     - category
                     - page
-                url:
-                  description:
-                    Base URL to the API of a Magento2 store.
-                  type: string
-                  example: "https://mymagento2store.com/rest/default/V1/"
             - title: Shoper Source Options
               description:
                 Required parameters to access a `shoper` source.
