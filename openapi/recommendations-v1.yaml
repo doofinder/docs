@@ -30,13 +30,12 @@ info:
 
     ## Caveats
 
-    ### Session IDs
+    Some recommendation types can personalize results using `user_id`. If it is not provided, the
+    widget returns its default, non-personalized results.
 
-    Some types of recommendations rely on user data to provide personalized product recommendations.
-    If such data is not provided, the API will use fallback results, if fallback is enabled.
-    If neither user data is provided nor fallback is enabled, then no recommendations will be returned.
-
-    Currently, the **Browsing history** recommendation type is the only one that requires a `session_id` to be included in the request.
+    The **Browsing history** recommendation relies entirely on the `product_history` field to know
+    what the user has seen. If it is not included in the request, no recommendations will be returned
+    unless fallback is enabled.
 
     ### CORS
 
@@ -541,6 +540,13 @@ components:
           nullable: true
           items:
             type: object
+        product_history:
+          type: array
+          nullable: true
+          description: Dfids of the products previously visited by the user, most recent first.
+          items:
+            type: string
+          example: ["de8f052ea612f95b6950d4013dd6ef38@product@a1b2c3", "de8f052ea612f95b6950d4013dd6ef38@product@d4e5f6"]
     RecommendationResponse:
       type: object
       properties:
