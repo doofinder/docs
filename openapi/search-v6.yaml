@@ -26,6 +26,16 @@ info:
     to send a HTTP Header with the name `Authorization` and the value `Token <API Key>`
     For example, for the key shown above:
     `Authorization: Token eu1-ab46030xza33960aac71a10248489b6c26172f07`
+    ## Client IP
+    If you're calling this API directly from your own backend, rather than through Doofinder's
+    JS layer, forward your end user's real IP address on every request, using one of:
+    - `X-Real-IP`
+    - `X-Forwarded-For`
+    Without one of these headers, every request from your integration will appear to come from
+    your server's single static IP address. Repeated requests from that one static IP can be
+    flagged as bot traffic, which silently drops the affected search and click/session stats
+    from your reports. It also skews any geographic breakdown in your stats, since it will be
+    based on your server's location instead of your end users' locations.
     ## Conventions
     Along most of the code samples you will find placeholders for some common variable values. They are:
     - `{hashid}`: The search engine's unique id. i.e.: d8fdeab7fce96a19d3fc7b0ca7a1e98b
