@@ -104,6 +104,10 @@ Track user sessions and identities to enable personalization and accurate analyt
 | `session_id` | 32 chars | Unique per browsing session. Generate a new one per visit. |
 | `user_id` | 36 chars | Persistent user identifier (e.g. UUID). Enables cross-session personalization. |
 
+<Note>
+  If you're calling this API directly from your own backend, rather than through Doofinder's JS layer, forward your end user's real IP address on every request, using one of `X-Real-IP` or `X-Forwarded-For`. Without one of these headers, every request from your integration will appear to come from your server's single static IP address. Repeated requests from that one static IP can be flagged as bot traffic, which silently drops the affected search and click/session stats from your reports. It also skews any geographic breakdown in your stats, since it will be based on your server's location instead of your end users' locations.
+</Note>
+
 ---
 
 ## Filters and Facets
