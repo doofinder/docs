@@ -490,9 +490,6 @@ components:
           items:
             type: string
           description: Fields to exclude from top_facet processing.
-        title_facet:
-          type: boolean
-          description: "Enable/Disable title_facet feature. Default: false"
         top_facet:
           type: boolean
           description: "Enable/Disable top_facet feature. Default: false"
@@ -796,12 +793,6 @@ components:
       required: true
       schema:
         type: string
-    title_facet:
-      name: title_facet
-      in: query
-      description: "Enable/Disable title_facet feature. Default: false"
-      schema:
-        type: boolean
     top_facet:
       name: top_facet
       in: query
@@ -848,7 +839,6 @@ paths:
         - $ref: "#/components/parameters/skip_auto_filters"
         - $ref: "#/components/parameters/skip_top_facet"
         - $ref: "#/components/parameters/sort"
-        - $ref: "#/components/parameters/title_facet"
         - $ref: "#/components/parameters/top_facet"
       responses:
         "200":
