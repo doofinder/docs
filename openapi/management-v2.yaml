@@ -1168,6 +1168,16 @@ components:
             error:
               code: too_many_temporary
               message: A temporary index already exists for this index
+    ConflictReindexInProgress:
+      description: 'Conflict — a reindex to the temporary index is already in progress.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: reindex_in_progress
+              message: A reindex to the temporary index is already in progress
     TooManyItemsBody:
       description: 'Request Entity Too Large — the bulk payload exceeds 8 MB.'
       content:
@@ -2056,7 +2066,7 @@ paths:
         '408':
           $ref: '#/components/responses/Timeout'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/ConflictReindexInProgress'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
