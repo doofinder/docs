@@ -965,7 +965,7 @@ components:
               example: Not found
             details:
               type: array
-              description: Optional list of per-field validation details (present on bad_params and errors_in_fields).
+              description: Optional list of per-field validation details (present on bad_params).
               items:
                 $ref: '#/components/schemas/ManagementErrorDetail'
           required:
