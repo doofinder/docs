@@ -229,7 +229,7 @@ components:
         currency:
           default: EUR
           description: Currency used in the search engine in ISO 4217 Code
-          enum:
+          enum: &search_engine_currencies
             - AED
             - ARS
             - AUD
@@ -306,7 +306,7 @@ components:
             (DEPRECATED), use `locale` field instead.
             Curently it won't have any effect in the Search Engine.
           example: es
-          enum:
+          enum: &search_engine_languages
             - ar
             - hy
             - eu
@@ -346,14 +346,6 @@ components:
           description:
             A short name that helps identifying the search engine.
           example: My Search Engine
-        site_url:
-          type: string
-          description:
-            (Deprecated) The URL of the site to be integrated with the search engine.
-            It determines the default allowed domains for requests.
-          nullable: true
-          deprecated: true
-          example: http://my.web.site
         search_url:
           description:
             Indicates the search server domain for this search engine. You should
@@ -378,7 +370,7 @@ components:
         platform:
           default: api
           description: Indicates which platform the search engine is associated with.
-          enum:
+          enum: &search_engine_platforms
             - api
             - shopify
             - woocommerce
@@ -413,6 +405,87 @@ components:
         A search engine groups a number of indices. Any search done to the
         search engine takes the best results of all indices beneath. Also,
         search engine options applies to all its indices.
+    SearchEngineUpdate:
+      title: Search Engine Update
+      type: object
+      additionalProperties: false
+      properties:
+        currency:
+          description: Currency used in the search engine in ISO 4217 Code
+          enum: *search_engine_currencies
+          example: EUR
+          type: string
+        hashid:
+          type: string
+          description: A unique code that identifies a search engine.
+          readOnly: true
+          example: 123456789012345678901234567890ab
+        indices:
+          $ref: '#/components/schemas/Indices'
+        status:
+          type: string
+          description:
+            Indicates the current status of the search engine.
+          readOnly: true
+          enum:
+            - active
+            - inactive
+          example: active
+        language:
+          deprecated: true
+          nullable: true
+          type: string
+          description:
+            (DEPRECATED), use `locale` field instead.
+            Curently it won't have any effect in the Search Engine.
+          example: es
+          enum: *search_engine_languages
+        locale:
+          type: string
+          description:
+            An ISO locale code is a standardized identifier combining language and region codes.
+            The language part, usually a two-letter code, is from ISO 639-1, while the region part
+            (optional, but recommended), often a two or three-letter code, is from ISO 3166-1.
+            Determines the locale of the search engine. The locale affects how the words indexed are
+            tokenized and which stopwords to use.
+          example: es-ES
+        name:
+          type: string
+          description:
+            A short name that helps identifying the search engine.
+          example: My Search Engine
+        search_url:
+          description:
+            Indicates the search server domain for this search engine. You should
+            use this domain to perform searches to this search engine.
+          type: string
+          format: uri
+          readOnly: true
+          example: https://eu1-search.doofinder.com
+        stopwords:
+          description:
+            Ignores high-frequency terms like "the", "and", "is". These words
+            have a low weight and contribute little to the relevance score.
+          type: boolean
+          example: false
+        default:
+          description:
+            Indicates if the search engine is the default one for the store.
+          type: boolean
+          example: false
+        platform:
+          description: Indicates which platform the search engine is associated with.
+          enum: *search_engine_platforms
+          type: string
+          example: shopify
+        has_grouping:
+          description:
+            When this option is selected, only one of the item variants
+            is returned in the search results. This only works if the
+            indexed item have the `group_id` field.
+          type: boolean
+      description:
+        Search engine fields to update. Fields not sent keep their current value.
     Indices:
       title: Indices
       type: array
@@ -425,12 +498,6 @@ components:
       type: object
       additionalProperties: false
       properties:
-        options:
-          description:
-            General options of an index. The options schema is
-            linked to the index preset.
-          title: Product Index Options
-          type: object
         datasources:
           $ref: '#/components/schemas/DataSources'
       description:
@@ -464,10 +531,6 @@ components:
             - page
             - category
           example: product
-        options:
-          title: Index Options
-          description: Accepted for backwards compatibility but ignored.
-          type: object
         datasources:
           $ref: '#/components/schemas/DataSources'
     DataSources:
@@ -2364,7 +2427,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchEngine'
+              allOf:
+                - $ref: '#/components/schemas/SearchEngineUpdate'
+                - anyOf:
+                    - type: object
+                      properties:
+                        locale: {}
+                      required:
+                        - locale
+                    - type: object
+                      properties:
+                        language:
+                          type: string
         required: true
       responses:
         200:
@@ -2432,6 +2506,17 @@ paths:
                     store_id: {}
                   required:
                     - store_id
+                - anyOf:
+                    - type: object
+                      properties:
+                        locale: {}
+                      required:
+                        - locale
+                    - type: object
+                      properties:
+                        language: {}
+                      required:
+                        - language
         required: true
       responses:
         '201':
