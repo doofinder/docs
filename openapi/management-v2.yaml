@@ -94,7 +94,7 @@ info:
 
     ### Batch size
 
-    Bulk item operations (create, update, delete) accept a maximum of **100 items per request**. Requests with more than 100 items will be rejected with a `422 Unprocessable Entity` error. Split larger payloads into batches of up to 100 items.
+    Bulk item operations (create, update, delete) accept a maximum of **100 items per request**. Requests with more than 100 items will be rejected with a `400 Bad Request` error (`bad_params`). Split larger payloads into batches of up to 100 items.
 
     # Objects
 
@@ -1199,8 +1199,8 @@ components:
             $ref: '#/components/schemas/ManagementError'
           example:
             error:
-              code: searchengine_timeout
-              message: Timeout connecting to backend
+              code: timeout
+              message: Timeout error
     Conflict:
       description: 'Conflict — the search engine is locked for processing or in an inactive state.'
       content:
@@ -1211,6 +1211,16 @@ components:
             error:
               code: searchengine_locked
               message: Search engine is being processed
+    ConflictInactive:
+      description: 'Conflict — the search engine is in an inactive state.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ManagementError'
+          example:
+            error:
+              code: searchengine_inactive
+              message: Your search engine is inactive and can not be modified.
     ConflictIndexExists:
       description: 'Conflict — an index with that name already exists.'
       content:
@@ -1241,26 +1251,25 @@ components:
             error:
               code: reindex_in_progress
               message: A reindex to the temporary index is already in progress
-    TooManyItemsBody:
-      description: 'Request Entity Too Large — the bulk payload exceeds 8 MB.'
+    PayloadTooLarge:
+      description: 'Payload Too Large — the request body exceeds the size limit.'
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ManagementError'
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+            required:
+              - error
           example:
             error:
-              code: too_many_items
-              message: Body is too large (max 8 MB)
-    TooManyItemsBulk:
-      description: 'Unprocessable Entity — the bulk array exceeds 100 items.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ManagementError'
-          example:
-            error:
-              code: too_many_items
-              message: Too many items in bulk request (max 100)
+              message: Request body is too large
     TooManyRequests:
       description: 'Too Many Requests — rate limit exceeded; back off and retry.'
       content:
@@ -1270,7 +1279,7 @@ components:
           example:
             error:
               code: too_many_requests
-              message: Too many requests
+              message: Too many requests per second
     InternalServerError:
       description: 'Internal Server Error — unexpected backend failure.'
       content:
@@ -1279,8 +1288,8 @@ components:
             $ref: '#/components/schemas/ManagementError'
           example:
             error:
-              code: internal_error
-              message: Internal server error
+              code: unexpected_error
+              message: An unexpected error has ocurred
     ServiceUnavailable:
       description: 'Service Unavailable — the Doomanager service is temporarily unavailable.'
       content:
@@ -1316,6 +1325,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/ConflictInactive'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1339,6 +1352,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/ConflictInactive'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1415,9 +1432,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
+          $ref: '#/components/responses/PayloadTooLarge'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1456,9 +1471,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
+          $ref: '#/components/responses/PayloadTooLarge'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1497,9 +1510,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
+          $ref: '#/components/responses/PayloadTooLarge'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1577,6 +1588,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/ConflictInactive'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1605,6 +1620,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/ConflictInactive'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1628,6 +1647,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1707,9 +1730,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
+          $ref: '#/components/responses/PayloadTooLarge'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1747,9 +1768,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
+          $ref: '#/components/responses/PayloadTooLarge'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1787,9 +1806,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '413':
-          $ref: '#/components/responses/TooManyItemsBody'
-        '422':
-          $ref: '#/components/responses/TooManyItemsBulk'
+          $ref: '#/components/responses/PayloadTooLarge'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1847,12 +1864,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Scroller'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/ConflictInactive'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1928,6 +1951,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/ConflictInactive'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1962,6 +1989,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/ConflictInactive'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -1991,14 +2022,14 @@ paths:
                 properties: {}
               example:
                 status: OK
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictTooManyTemp'
         '429':
@@ -2025,6 +2056,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2060,8 +2093,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '408':
           $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2092,6 +2123,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2173,12 +2206,18 @@ paths:
       responses:
         '204':
           description: Index deleted.
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2213,8 +2252,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/Conflict'
         '429':
@@ -2277,6 +2314,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '408':
+          $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictIndexExists'
         '429':
@@ -2308,6 +2347,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ConflictInactive'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2354,14 +2395,16 @@ paths:
                 example:
                   href: /api/v2/search_engines/{hashid}/_process
                   message: PROCESS_CREATED
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2455,10 +2498,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '408':
-          $ref: '#/components/responses/Timeout'
-        '409':
-          $ref: '#/components/responses/Conflict'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
