@@ -2200,6 +2200,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2291,6 +2293,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
