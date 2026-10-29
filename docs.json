@@ -102,11 +102,19 @@
     },
     {
       "source": "/api/category-merchandising",
-      "destination": "/category-merchandising/overview"
+      "destination": "/category-pages/overview"
     },
     {
       "source": "/api/category-merchandising/",
-      "destination": "/category-merchandising/overview"
+      "destination": "/category-pages/overview"
+    },
+    {
+      "source": "/category-merchandising/overview",
+      "destination": "/category-pages/overview"
+    },
+    {
+      "source": "/api-reference/category-merchandising/get-category-page-results",
+      "destination": "/api-reference/category-pages/get-category-page-results"
     }
   ],
   "navigation": {
@@ -190,12 +198,12 @@
         ]
       },
       {
-        "tab": "Category Merchandising API",
+        "tab": "Category Pages API",
         "groups": [
           {
             "group": "Overview",
             "pages": [
-              "category-merchandising/overview"
+              "category-pages/overview"
             ]
           },
           {
