@@ -2443,6 +2443,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2458,12 +2460,16 @@ paths:
       responses:
         '204':
           description: Search engines deleted.
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2533,6 +2539,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
