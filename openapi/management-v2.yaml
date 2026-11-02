@@ -2234,6 +2234,8 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/Conflict'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
