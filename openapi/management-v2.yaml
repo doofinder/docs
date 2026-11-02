@@ -1300,16 +1300,6 @@ components:
             error:
               code: unexpected_error
               message: An unexpected error has ocurred
-    ServiceUnavailable:
-      description: 'Service Unavailable — the Doomanager service is temporarily unavailable.'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ManagementError'
-          example:
-            error:
-              code: doomanager_unavailable
-              message: Processing service is temporarily unavailable
 paths:
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/{item_id}':
     get:
@@ -2373,6 +2363,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/ConflictInactive'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
@@ -2429,12 +2421,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}':
     get:
       tags:
