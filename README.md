@@ -1,6 +1,6 @@
 # Doofinder API Reference Docs
 
-Source for the Doofinder developer documentation site — Search API, Management API, Stats API, Recommendations API, and Category Merchandising API.
+Source for the Doofinder developer documentation site — Search API, Management API, Stats API, Recommendations API, and Category Pages API.
 
 ## Local development
 

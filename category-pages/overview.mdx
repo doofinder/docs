@@ -1,0 +1,196 @@
+---
+title: "Category Pages API"
+description: "Retrieve search results for category listing pages, with the category's filter, facets, sort and merchandising rules applied."
+---
+
+The Category Pages API (formerly Category Merchandising API) powers category listing pages (PLPs) on your ecommerce site. You tell it which category to render with a base filter, and it returns a paginated, faceted result set with your merchandising rules (pinning, boosting, hiding, sort order) and banner already applied.
+
+**Version:** 1.0
+
+## Base URL
+
+```
+https://{zone}-category-pages.doofinder.com/api/1
+```
+
+Supported zones: `eu1`, `us1`, `ap1`
+
+<Note>
+  The former `{zone}-category-merchandising.doofinder.com` host still works but is deprecated. Use `{zone}-category-pages.doofinder.com` for new integrations.
+</Note>
+
+## Authentication
+
+The API supports two authentication methods:
+
+- **CORS (browser requests):** requests from a domain registered as an allowed origin for the search engine are authenticated automatically. Allowed origins come from the site URL configured in your search engine settings.
+- **API token (server-side requests):** include an `Authorization` header with a valid API token.
+
+```http
+Authorization: Token {your_token}
+```
+
+The token is validated against the account owning the search engine identified by `hashid`. A missing, invalid, or unauthorized token returns `401 Unauthorized`.
+
+---
+
+## How it works
+
+<Steps>
+  <Step title="Configure your category pages in the Admin Panel">
+    Go to **Category Merchandising → Configuration** and set up the facets, sort, rules and banners for your categories.
+  </Step>
+  <Step title="Call the API on page load">
+    Send `POST /category_pages/{hashid}` with the category's `base_filter` (e.g. `{"category_merchandising": "shoes"}`) in the JSON body.
+  </Step>
+  <Step title="Render the product grid">
+    The response contains a paginated `results` array, `facets` for the filter UI, the applied `base_filter` and `filter`, and an optional promotional `banner`.
+  </Step>
+</Steps>
+
+---
+
+## Endpoint
+
+```
+POST https://{zone}-category-pages.doofinder.com/api/1/category_pages/{hashid}
+```
+
+Send the parameters as a JSON body with `Content-Type: application/json`.
+
+### Required parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `hashid` | Your search engine ID (path parameter). |
+| `base_filter` | The category to render: an object with exactly one field and a non-empty string value, e.g. `{"category_merchandising": "shoes"}`. |
+
+### Optional parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `page` | `1` | Page number (1-indexed). |
+| `rpp` | `50` | Results per page. |
+| `currency` | — | ISO 4217 code (e.g. `EUR`). Converts prices using exchange rates from your search engine config. |
+| `sort` | category config | List of single-field objects, e.g. `[{"price": "asc"}]`. Directions are `asc` or `desc`. Overrides the sort configured for the category. |
+| `filter` | — | Additional filters on top of the base filter. Maps each field to a value, a list of values, or a range object (`gt`, `gte`, `lt`, `lte`). |
+| `exclude` | — | Excludes items matching the given field values. Same format as `filter`. |
+| `results_personalization_dfids` | — | `dfid` values of recently-interacted items. Re-ranks results for contextual relevance. |
+
+---
+
+## Example request
+
+```bash
+curl -X POST "https://eu1-category-pages.doofinder.com/api/1/category_pages/d8fdeab7fce96a19d3fc7b0ca7a1e98b" \
+  -H "Authorization: Token ab46030xza33960aac71a10248489b6c26172f07" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "base_filter": {"category_merchandising": "shoes"},
+    "filter": {"brand": ["Nike"], "price": {"gte": 50}},
+    "sort": [{"price": "asc"}],
+    "rpp": 24
+  }'
+```
+
+## Example response
+
+```json
+{
+  "results": [
+    {
+      "dfid": "abc1234de@product@a1b2c3",
+      "id": "SKU-001",
+      "title": "Running Shoes Model X",
+      "price": 99.99,
+      "url": "https://shop.example.com/products/sku-001",
+      "image_url": "https://shop.example.com/images/sku-001.jpg"
+    }
+  ],
+  "total": 243,
+  "page": 1,
+  "rpp": 24,
+  "base_filter": [
+    { "field": "category_merchandising", "values": ["shoes"] }
+  ],
+  "filter": [
+    { "field": "brand", "values": ["Nike"] },
+    { "field": "price", "values": { "gte": 50 } }
+  ],
+  "facets": {
+    "brand": {
+      "_type": "terms",
+      "buckets": [
+        { "key": "Nike", "doc_count": 42 },
+        { "key": "Adidas", "doc_count": 38 }
+      ]
+    },
+    "price": {
+      "_type": "range",
+      "buckets": [
+        { "stats": { "min": 9.99, "max": 499.99, "avg": 89.5 } }
+      ]
+    }
+  },
+  "banner": {
+    "id": "189523",
+    "image": "https://shop.example.com/banners/shoes-banner.jpg",
+    "mobile_image": "https://shop.example.com/banners/shoes-banner-mobile.jpg",
+    "html_code": null,
+    "link": "https://shop.example.com/sale/shoes",
+    "target_blank": true
+  }
+}
+```
+
+---
+
+## Key concepts
+
+### Base filter vs. client filter
+
+| | `base_filter` | `filter` |
+|---|---|---|
+| **Source** | The category the page renders | Your shopper's filter selection |
+| **Selects category config?** | Yes — sort rules, merchandising rules and banner | No |
+| **Appears in facets?** | Yes | Yes |
+
+The base filter is always applied. Client `filter` values are combined with it: different fields are combined with AND, and values for the same field (including the base filter field) are combined with OR. Filter values are case-sensitive, so they must match the indexed values exactly.
+
+Facets for the base filter field are returned like any other facet, so your UI can let shoppers widen the category selection.
+
+### Facet types
+
+| Type | Description | Render as |
+|------|-------------|-----------|
+| `terms` | Discrete keyword values with counts | Checkbox list |
+| `range` | Numeric min/max/avg stats | Price slider |
+
+### Banner
+
+If a promotional banner is configured for the category in the Admin Panel, it appears in the `banner` field. Use `html_code` when present (takes precedence over `image`); fall back to `image` / `mobile_image` otherwise. A banner from an active merchandising campaign takes precedence over the category one.
+
+---
+
+## Error responses
+
+| Status | Description |
+|--------|-------------|
+| `400` | `base_filter` is missing or invalid, or `filter`, `exclude`, `sort` or `currency` are malformed |
+| `401` | Authorization header is missing, invalid, or unauthorized |
+| `404` | The search engine has no category pages configuration |
+| `502` | Upstream search engine error |
+
+---
+
+## Migrating from the deprecated endpoint
+
+`GET /category_merchandising/{hashid}` is deprecated. It derives the base filter by matching a page `url` against the URL patterns configured in the Admin Panel. Its responses carry a `Deprecation` header ([RFC 9745](https://www.rfc-editor.org/rfc/rfc9745)) and a `Link` header pointing to the successor endpoint.
+
+To migrate:
+
+1. Switch to `POST /category_pages/{hashid}` on the `{zone}-category-pages.doofinder.com` host.
+2. Replace the `url` param with `base_filter`, using the field and value of the category the page renders.
+3. Move the remaining params to the JSON body: `sort[N][field]=direction` becomes `"sort": [{"field": "direction"}]`, and `filter[field][]=value` / `exclude[field][]=value` become `"filter": {"field": ["value"]}` / `"exclude": {"field": ["value"]}`.
+
+The response format is the same.
