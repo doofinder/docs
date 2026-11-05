@@ -262,282 +262,6 @@ components:
             $ref: '#/components/schemas/StatsError'
       description: Unauthorized — no valid API token provided.
   schemas:
-    has_init:
-      default: true
-      description: Indicates if the sale was made after using a doofinder product
-        or not
-      type: boolean
-    StatsResultSerchesResult:
-      allOf:
-      - $ref: '#/components/schemas/StatsResult'
-      - description: Stats searches from results.
-        properties:
-          results:
-            items:
-              properties:
-                brand:
-                  example: Garnier
-                  type: string
-                categories:
-                  example:
-                  - Perfumes
-                  - OtroCategoria
-                  items:
-                    type: string
-                  type: array
-                count:
-                  example: 12
-                  type: integer
-              type: object
-            type: array
-        title: Top results searches
-        type: object
-      example:
-        results:
-        - brand: Garnier
-          categories: Perfumes
-          count: 200
-        total: 1
-        total_count: 200
-    StatsTimeResult:
-      allOf:
-      - $ref: '#/components/schemas/StatsResult'
-      - description: Stats counter with timestamp.
-        properties:
-          results:
-            items:
-              properties:
-                count:
-                  example: 12
-                  type: integer
-                timestamp:
-                  example: 1581120000000
-                  type: integer
-              type: object
-            type: array
-        title: Counters Stats by Time
-        type: object
-      example:
-        results:
-        - count: 12
-          timestamp: 1581120000000
-        total: 1
-        total_count: 12
-    CartJSONRegisterRequest:
-      properties:
-        checkout_json:
-          $ref: '#/components/schemas/checkout_json'
-        currency:
-          $ref: '#/components/schemas/currency'
-        hashid:
-          $ref: '#/components/schemas/hashid'
-        ip:
-          $ref: '#/components/schemas/ip'
-        referer:
-          $ref: '#/components/schemas/referer'
-        session_id:
-          $ref: '#/components/schemas/session_id'
-        user_agent:
-          $ref: '#/components/schemas/user_agent'
-        user_id:
-          $ref: '#/components/schemas/user_id'
-      required:
-      - hashid
-      - checkout_json
-      type: object
-    StatsError:
-      description: Standard error wrapper for all Stats API error responses.
-      properties:
-        error:
-          properties:
-            code:
-              description: Machine-readable error code.
-              example: not_authenticated
-              type: string
-            message:
-              description: Human-readable error description.
-              example: Authentication required
-              type: string
-          required:
-          - code
-          type: object
-      required:
-      - error
-      type: object
-    hashid:
-      description: Unique id of the search engine. In the search engine selector,
-        you will find the hashid information
-      pattern: ^[a-f0-9]{32}$
-      type: string
-    user_id:
-      description: Identifier of user
-      maxLength: 36
-      type: string
-    StatsTopSearchesResult:
-      allOf:
-      - $ref: '#/components/schemas/StatsResult'
-      - description: Stats results for top searches.
-        properties:
-          results:
-            items:
-              properties:
-                count:
-                  example: 12
-                  type: integer
-                query:
-                  example: some term
-                  type: string
-              type: object
-            type: array
-        title: Top Searches Stats
-        type: object
-      example:
-        results:
-        - count: 12
-          query: some term
-        total: 1
-        total_count: 12
-    RegisterResult:
-      description: Response returned over register stat operation.
-      example:
-        status: registered
-      properties:
-        status:
-          description: Result of the stats request. i.e. 'registered'
-          type: string
-      title: Stats Response
-      type: object
-    TopSalesResult:
-      description: Top Stats results for Sales.
-      example:
-        results:
-        - avg_price: 500
-          dfid: 070cdedbb32a134ad74db5ac9cd93b36@product@74446c03dd1ae404c61723db51a6766b
-          sum_amount: 30
-          title: coffee capsules
-        - avg_price: 200.25
-          dfid: 070cdedab32a134ad74db5ac9cd93b36@product@744d6c03dd1ae404c61723db51a6766b
-          sum_amount: 20
-          title: pencils
-        total: 2
-        total_count: 2
-      properties:
-        results:
-          items:
-            properties:
-              avg_price:
-                example: 3000
-                type: number
-              dfid:
-                example: 070cdedbb32a134ad74db5ac9cd93b36@product@74446c03dd1ae404c61723db51a6766b
-                type: string
-              sum_amount:
-                example: 21
-                type: integer
-              title:
-                example: Item Title
-                type: string
-            type: object
-          type: array
-        total:
-          description: Count of all top sales retrieved.
-          example: 1
-          type: integer
-        total_count:
-          description: Count of all top sales retrieved.
-          example: 12
-          type: integer
-      title: Top Sales Results Stats
-      type: object
-    StatsBannersResult:
-      allOf:
-      - $ref: '#/components/schemas/StatsResult'
-      - description: Stats results for banners.
-        properties:
-          results:
-            items:
-              properties:
-                clicks:
-                  example: 2
-                  type: integer
-                displays:
-                  example: 12
-                  type: integer
-                id:
-                  example: 3561
-                  type: integer
-              type: object
-            type: array
-        title: Banner Stats
-        type: object
-      example:
-        results:
-        - clicks: 2
-          displays: 12
-          id: 3561
-        total: 1
-        total_count: 1
-    StatsFacetsResult:
-      allOf:
-      - $ref: '#/components/schemas/StatsResult'
-      - description: Stats results for facets.
-        properties:
-          results:
-            items:
-              properties:
-                count:
-                  description: Number of times facet has been used in provided time
-                    range
-                  type: integer
-                facet:
-                  description: Used facet
-                  type: string
-                timestamp:
-                  description: Date timestamp in the format of UNIX timestamp or YYYYMMDD.
-                  type: integer
-              type: object
-            type: array
-        title: Facets Stats
-        type: object
-      example:
-        results:
-        - count: 12
-          facet: brand
-          timestamp: 1581120000000
-        total: 1
-        total_count: 12
-    StatsRedirectsResult:
-      allOf:
-      - $ref: '#/components/schemas/StatsResult'
-      - description: Stats results for redirections.
-        properties:
-          results:
-            items:
-              properties:
-                count:
-                  example: 12
-                  type: integer
-                id:
-                  example: 9771
-                  type: integer
-                link:
-                  example: https://example.com/redirection
-                  type: string
-              type: object
-            type: array
-        title: Redirects Stats
-        type: object
-      example:
-        results:
-        - count: 12
-          id: 9771
-          link: https://example.com/redirection
-        total: 1
-        total_count: 12
-    checkout_html:
-      description: Base 64-encoded html for the checkout page. It should only contain
-        the cart's products.
-      type: string
     StatsCustomresultsResult:
       allOf:
       - $ref: '#/components/schemas/StatsResult'
@@ -569,25 +293,6 @@ components:
           id: 3220
         total: 2
         total_count: 2
-    SaleRequest:
-      properties:
-        has_init:
-          $ref: '#/components/schemas/has_init'
-        hashid:
-          $ref: '#/components/schemas/hashid'
-        ip:
-          $ref: '#/components/schemas/ip'
-        referer:
-          $ref: '#/components/schemas/referer'
-        session_id:
-          $ref: '#/components/schemas/session_id'
-        user_agent:
-          $ref: '#/components/schemas/user_agent'
-        user_id:
-          $ref: '#/components/schemas/user_id'
-      required:
-      - hashid
-      type: object
     StatsTopFacetsResult:
       allOf:
       - $ref: '#/components/schemas/StatsResult'
@@ -654,98 +359,79 @@ components:
             lt: '200'
         total: 2
         total_count: 17
-    user_agent:
-      deprecated: true
-      description: Identifier of device. Detected automatically by the server.
-      type: string
-    currency:
-      description: Currency of the checkout.
-      example: EUR
-      type: string
     url:
       description: Page URI visited by the user
       type: string
-    SearchEngineUsageResult:
-      description: Stats for user behaviour for a search engine.
-      example:
-        results:
-        - inits: 2000
-          searches: 8000
-          visits: 3000
-        total: 0
-        total_count: 0
-      properties:
-        results:
-          items:
-            properties:
-              inits:
-                description: How many times the layer has been loaded (unique clicks
-                  on search bar)
-                example: 2000
-                type: integer
-              searches:
-                description: Total of searches done
-                example: 8000
-                type: integer
-              visits:
-                description: How many visits a store has received
-                example: 3000
-                type: number
-            type: object
-          type: array
-        total:
-          description: Always 0.
-          example: 0
-          type: integer
-        total_count:
-          description: Always 0.
-          example: 0
-          type: integer
-      title: Search engine user stats
-      type: object
-    StatsInitsUsersResult:
+    StatsResultSerchesResult:
       allOf:
       - $ref: '#/components/schemas/StatsResult'
-      - description: Inits users result.
-        example:
-          results:
-          - sessions: 12170
-            unique_sessions: 159080
-            users: 5876
-          total: 1
-          total_count: 1
+      - description: Stats searches from results.
         properties:
           results:
             items:
               properties:
-                sessions:
-                  example: 12170
-                  type: integer
-                unique_sessions:
-                  example: 159080
-                  type: integer
-                users:
-                  example: 5876
+                brand:
+                  example: Garnier
+                  type: string
+                categories:
+                  example:
+                  - Perfumes
+                  - OtroCategoria
+                  items:
+                    type: string
+                  type: array
+                count:
+                  example: 12
                   type: integer
               type: object
             type: array
-        title: Inits Users
+        title: Top results searches
         type: object
-    referer:
+      example:
+        results:
+        - brand: Garnier
+          categories: Perfumes
+          count: 200
+        total: 1
+        total_count: 200
+    ip:
       deprecated: true
-      description: The referer header value, provides information about the URL from
-        which the current request originated. Detected automatically by the server.
+      description: Unique address that identifies a device. Detected automatically
+        by the server.
       type: string
-    store:
-      description: Identifier of store. In the store setup section, you will find
-        the store ID information.
-      maxLength: 36
-      minLength: 1
-      type: string
-    StatsClickedItemsResult:
+    StatsFacetsResult:
       allOf:
       - $ref: '#/components/schemas/StatsResult'
-      - description: Stats results for clicked items.
+      - description: Stats results for facets.
+        properties:
+          results:
+            items:
+              properties:
+                count:
+                  description: Number of times facet has been used in provided time
+                    range
+                  type: integer
+                facet:
+                  description: Used facet
+                  type: string
+                timestamp:
+                  description: Date timestamp in the format of UNIX timestamp or YYYYMMDD.
+                  type: integer
+              type: object
+            type: array
+        title: Facets Stats
+        type: object
+      example:
+        results:
+        - count: 12
+          facet: brand
+          timestamp: 1581120000000
+        total: 1
+        total_count: 12
+    StatsTopSearchesResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - description: Stats results for top searches.
         properties:
           results:
             items:
@@ -753,61 +439,88 @@ components:
                 count:
                   example: 12
                   type: integer
-                dfid:
-                  example: abff7f4819f8e532ef11ce6638963b4e@product@567b8f5f423af15818a068235807edc0
-                  type: string
-                link:
-                  example: https://example.com/item1
-                  type: string
-                title:
-                  example: Item Name
+                query:
+                  example: some term
                   type: string
               type: object
             type: array
-        title: Clicks Stats
+        title: Top Searches Stats
         type: object
       example:
         results:
         - count: 12
-          dfid: abff7f4819f8e532ef11ce6638963b4e@product@567b8f5f423af15818a068235807edc0
-          link: https://example.com/item1
-          source:
-            link: https://example.com/item1
-            title: Item Name
-          title: Item Name
+          query: some term
         total: 1
         total_count: 12
-    StatsClicksItemsPositionResult:
+    VisitRegisterRequest:
+      properties:
+        dfid:
+          type: string
+        hashid:
+          $ref: '#/components/schemas/hashid'
+        ip:
+          $ref: '#/components/schemas/ip'
+        page_type:
+          type: string
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        store:
+          $ref: '#/components/schemas/store'
+        url:
+          $ref: '#/components/schemas/url'
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+      required:
+      - store
+      type: object
+    hashid:
+      description: Unique id of the search engine. In the search engine selector,
+        you will find the hashid information
+      pattern: ^[a-f0-9]{32}$
+      type: string
+    StatsClicksUsersResult:
       allOf:
       - $ref: '#/components/schemas/StatsResult'
-      - description: Clicks items position result.
+      - description: Clicks users result.
         properties:
           results:
             items:
               properties:
                 clicks:
-                  description: How many clicks that product had in that position
                   example: 12170
                   type: integer
-                position:
-                  description: The product's position when clicked
-                  example: 10
+                product_clicks:
+                  example: 159080
                   type: integer
-                product:
-                  description: The Id of the product
+                users:
                   example: 5876
-                  type: string
+                  type: integer
               type: object
             type: array
-        title: Clicks Items Position
+        title: Clicks Users
         type: object
       example:
         results:
         - clicks: 12170
           product_clicks: 159080
-          sum_product_position: 5876
+          users: 5876
         total: 1
         total_count: 1
+    StatsResult:
+      properties:
+        total:
+          description: Sum of all elements retrieved.
+          example: 1
+          type: integer
+        total_count:
+          description: Total sum of all elements count. If element does not have a
+            "count", this has the same value as `total`.
+          example: 12
+          type: integer
+      title: Stats Result
+      type: object
     checkout_json:
       description: Checkout json array with the cart items basic data.
       example:
@@ -844,56 +557,107 @@ components:
         - price
         type: object
       type: array
-    StatsResult:
-      properties:
-        total:
-          description: Sum of all elements retrieved.
-          example: 1
-          type: integer
-        total_count:
-          description: Total sum of all elements count. If element does not have a
-            "count", this has the same value as `total`.
-          example: 12
-          type: integer
-      title: Stats Result
-      type: object
-    StatsSalesResult:
-      description: Stats results for Sales.
+    store:
+      description: Identifier of store. In the store setup section, you will find
+        the store ID information.
+      maxLength: 36
+      minLength: 1
+      type: string
+    TopSalesResult:
+      description: Top Stats results for Sales.
       example:
         results:
-        - amount: 2.2
-          session: 24cb1eccd1cf4a67d071f2deeac75e33
-        - amount: 1.0
-          session: a4eaf92a223c024b7c6680dc807c3f84
+        - avg_price: 500
+          dfid: 070cdedbb32a134ad74db5ac9cd93b36@product@74446c03dd1ae404c61723db51a6766b
+          sum_amount: 30
+          title: coffee capsules
+        - avg_price: 200.25
+          dfid: 070cdedab32a134ad74db5ac9cd93b36@product@744d6c03dd1ae404c61723db51a6766b
+          sum_amount: 20
+          title: pencils
         total: 2
-        total_amount: 3.2
+        total_count: 2
       properties:
         results:
           items:
             properties:
-              amount:
-                example: 2.0
-                format: float
+              avg_price:
+                example: 3000
                 type: number
-              session:
-                example: ed8fb684573cdbb3d511e465c04e2d21
+              dfid:
+                example: 070cdedbb32a134ad74db5ac9cd93b36@product@74446c03dd1ae404c61723db51a6766b
+                type: string
+              sum_amount:
+                example: 21
+                type: integer
+              title:
+                example: Item Title
                 type: string
             type: object
           type: array
         total:
-          description: Count of all sales retrieved.
+          description: Count of all top sales retrieved.
           example: 1
           type: integer
-        total_amount:
-          description: Total sum of all sales amount.
+        total_count:
+          description: Count of all top sales retrieved.
           example: 12
           type: integer
-      title: Sales Results Stats
+      title: Top Sales Results Stats
       type: object
-    ip:
+    StatsRedirectsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - description: Stats results for redirections.
+        properties:
+          results:
+            items:
+              properties:
+                count:
+                  example: 12
+                  type: integer
+                id:
+                  example: 9771
+                  type: integer
+                link:
+                  example: https://example.com/redirection
+                  type: string
+              type: object
+            type: array
+        title: Redirects Stats
+        type: object
+      example:
+        results:
+        - count: 12
+          id: 9771
+          link: https://example.com/redirection
+        total: 1
+        total_count: 12
+    CartJSONRegisterRequest:
+      properties:
+        checkout_json:
+          $ref: '#/components/schemas/checkout_json'
+        currency:
+          $ref: '#/components/schemas/currency'
+        hashid:
+          $ref: '#/components/schemas/hashid'
+        ip:
+          $ref: '#/components/schemas/ip'
+        referer:
+          $ref: '#/components/schemas/referer'
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+      required:
+      - hashid
+      - checkout_json
+      type: object
+    user_agent:
       deprecated: true
-      description: Unique address that identifies a device. Detected automatically
-        by the server.
+      description: Identifier of device. Detected automatically by the server.
       type: string
     StatsLocationResult:
       allOf:
@@ -921,29 +685,51 @@ components:
           longitude: -3.636
         total: 1
         total_count: 1
-    VisitRegisterRequest:
+    RegisterResult:
+      description: Response returned over register stat operation.
+      example:
+        status: registered
       properties:
-        dfid:
+        status:
+          description: Result of the stats request. i.e. 'registered'
           type: string
-        hashid:
-          $ref: '#/components/schemas/hashid'
-        ip:
-          $ref: '#/components/schemas/ip'
-        page_type:
-          type: string
-        session_id:
-          $ref: '#/components/schemas/session_id'
-        store:
-          $ref: '#/components/schemas/store'
-        url:
-          $ref: '#/components/schemas/url'
-        user_agent:
-          $ref: '#/components/schemas/user_agent'
-        user_id:
-          $ref: '#/components/schemas/user_id'
-      required:
-      - store
+      title: Stats Response
       type: object
+    StatsClickedItemsResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - description: Stats results for clicked items.
+        properties:
+          results:
+            items:
+              properties:
+                count:
+                  example: 12
+                  type: integer
+                dfid:
+                  example: abff7f4819f8e532ef11ce6638963b4e@product@567b8f5f423af15818a068235807edc0
+                  type: string
+                link:
+                  example: https://example.com/item1
+                  type: string
+                title:
+                  example: Item Name
+                  type: string
+              type: object
+            type: array
+        title: Clicks Stats
+        type: object
+      example:
+        results:
+        - count: 12
+          dfid: abff7f4819f8e532ef11ce6638963b4e@product@567b8f5f423af15818a068235807edc0
+          link: https://example.com/item1
+          source:
+            link: https://example.com/item1
+            title: Item Name
+          title: Item Name
+        total: 1
+        total_count: 12
     StatsSearchesLocationResult:
       allOf:
       - $ref: '#/components/schemas/StatsResult'
@@ -986,23 +772,198 @@ components:
           query: perfume y hombre
         total: 1
         total_count: 1
+    StatsError:
+      description: Standard error wrapper for all Stats API error responses.
+      properties:
+        error:
+          properties:
+            code:
+              description: Machine-readable error code.
+              example: not_authenticated
+              type: string
+            message:
+              description: Human-readable error description.
+              example: Authentication required
+              type: string
+          required:
+          - code
+          type: object
+      required:
+      - error
+      type: object
+    SearchEngineUsageResult:
+      description: Stats for user behaviour for a search engine.
+      example:
+        results:
+        - inits: 2000
+          searches: 8000
+          visits: 3000
+        total: 0
+        total_count: 0
+      properties:
+        results:
+          items:
+            properties:
+              inits:
+                description: How many times the layer has been loaded (unique clicks
+                  on search bar)
+                example: 2000
+                type: integer
+              searches:
+                description: Total of searches done
+                example: 8000
+                type: integer
+              visits:
+                description: How many visits a store has received
+                example: 3000
+                type: number
+            type: object
+          type: array
+        total:
+          description: Always 0.
+          example: 0
+          type: integer
+        total_count:
+          description: Always 0.
+          example: 0
+          type: integer
+      title: Search engine user stats
+      type: object
     session_id:
       description: Identifier of search session
       maxLength: 32
       nullable: true
       type: string
-    StatsClicksUsersResult:
+    StatsTimeResult:
       allOf:
       - $ref: '#/components/schemas/StatsResult'
-      - description: Clicks users result.
+      - description: Stats counter with timestamp.
+        properties:
+          results:
+            items:
+              properties:
+                count:
+                  example: 12
+                  type: integer
+                timestamp:
+                  example: 1581120000000
+                  type: integer
+              type: object
+            type: array
+        title: Counters Stats by Time
+        type: object
+      example:
+        results:
+        - count: 12
+          timestamp: 1581120000000
+        total: 1
+        total_count: 12
+    StatsSalesResult:
+      description: Stats results for Sales.
+      example:
+        results:
+        - amount: 2.2
+          session: 24cb1eccd1cf4a67d071f2deeac75e33
+        - amount: 1.0
+          session: a4eaf92a223c024b7c6680dc807c3f84
+        total: 2
+        total_amount: 3.2
+      properties:
+        results:
+          items:
+            properties:
+              amount:
+                example: 2.0
+                format: float
+                type: number
+              session:
+                example: ed8fb684573cdbb3d511e465c04e2d21
+                type: string
+            type: object
+          type: array
+        total:
+          description: Count of all sales retrieved.
+          example: 1
+          type: integer
+        total_amount:
+          description: Total sum of all sales amount.
+          example: 12
+          type: integer
+      title: Sales Results Stats
+      type: object
+    user_id:
+      description: Identifier of user
+      maxLength: 36
+      nullable: true
+      type: string
+    checkout_html:
+      description: Base 64-encoded html for the checkout page. It should only contain
+        the cart's products.
+      type: string
+    currency:
+      description: Currency of the checkout.
+      example: EUR
+      type: string
+    referer:
+      deprecated: true
+      description: The referer header value, provides information about the URL from
+        which the current request originated. Detected automatically by the server.
+      type: string
+    has_init:
+      default: true
+      description: Indicates if the sale was made after using a doofinder product
+        or not
+      type: boolean
+    StatsClicksItemsPositionResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - description: Clicks items position result.
         properties:
           results:
             items:
               properties:
                 clicks:
+                  description: How many clicks that product had in that position
                   example: 12170
                   type: integer
-                product_clicks:
+                position:
+                  description: The product's position when clicked
+                  example: 10
+                  type: integer
+                product:
+                  description: The Id of the product
+                  example: 5876
+                  type: string
+              type: object
+            type: array
+        title: Clicks Items Position
+        type: object
+      example:
+        results:
+        - clicks: 12170
+          product_clicks: 159080
+          sum_product_position: 5876
+        total: 1
+        total_count: 1
+    StatsInitsUsersResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - description: Inits users result.
+        example:
+          results:
+          - sessions: 12170
+            unique_sessions: 159080
+            users: 5876
+          total: 1
+          total_count: 1
+        properties:
+          results:
+            items:
+              properties:
+                sessions:
+                  example: 12170
+                  type: integer
+                unique_sessions:
                   example: 159080
                   type: integer
                 users:
@@ -1010,15 +971,55 @@ components:
                   type: integer
               type: object
             type: array
-        title: Clicks Users
+        title: Inits Users
+        type: object
+    StatsBannersResult:
+      allOf:
+      - $ref: '#/components/schemas/StatsResult'
+      - description: Stats results for banners.
+        properties:
+          results:
+            items:
+              properties:
+                clicks:
+                  example: 2
+                  type: integer
+                displays:
+                  example: 12
+                  type: integer
+                id:
+                  example: 3561
+                  type: integer
+              type: object
+            type: array
+        title: Banner Stats
         type: object
       example:
         results:
-        - clicks: 12170
-          product_clicks: 159080
-          users: 5876
+        - clicks: 2
+          displays: 12
+          id: 3561
         total: 1
         total_count: 1
+    SaleRequest:
+      properties:
+        has_init:
+          $ref: '#/components/schemas/has_init'
+        hashid:
+          $ref: '#/components/schemas/hashid'
+        ip:
+          $ref: '#/components/schemas/ip'
+        referer:
+          $ref: '#/components/schemas/referer'
+        session_id:
+          $ref: '#/components/schemas/session_id'
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        user_id:
+          $ref: '#/components/schemas/user_id'
+      required:
+      - hashid
+      type: object
   securitySchemes:
     api_token:
       description: "Doofinder API key. The `Token` prefix is part of the header value,\
