@@ -1270,15 +1270,15 @@ components:
           example:
             error:
               message: Request body is too large
-    FailedDependency:
-      description: 'Failed Dependency — an internal service required to complete the request failed.'
+    ServiceUnavailable:
+      description: 'Service Unavailable — an internal service required to complete the request failed.'
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ManagementError'
           example:
             error:
-              code: failed_dependency
+              code: service_unavailable
               message: An internal service required to complete the request failed
     TooManyRequests:
       description: 'Too Many Requests — rate limit exceeded; back off and retry.'
@@ -1329,12 +1329,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictInactive'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     delete:
       tags:
         - Items
@@ -1358,12 +1358,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictInactive'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     patch:
       tags:
         - Items
@@ -1397,12 +1397,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/Conflict'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: item
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/_bulk':
     post:
@@ -1439,12 +1439,12 @@ paths:
           $ref: '#/components/responses/Conflict'
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: bulk
     delete:
       tags:
@@ -1480,12 +1480,12 @@ paths:
           $ref: '#/components/responses/Conflict'
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: bulk
     patch:
       tags:
@@ -1521,12 +1521,12 @@ paths:
           $ref: '#/components/responses/Conflict'
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: bulk
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/':
     post:
@@ -1563,12 +1563,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/Conflict'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: item
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/items/_mget':
     post:
@@ -1606,12 +1606,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictInactive'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}/indices/{name}/items/{item_id}':
     get:
       tags:
@@ -1640,12 +1640,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictInactive'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     delete:
       tags:
         - Items
@@ -1669,12 +1669,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/Conflict'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     patch:
       tags:
         - Items
@@ -1712,12 +1712,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/Conflict'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: item
   '/api/v2/search_engines/{hashid}/indices/{name}/items/_bulk':
     post:
@@ -1753,12 +1753,12 @@ paths:
           $ref: '#/components/responses/Conflict'
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: bulk
     delete:
       tags:
@@ -1793,12 +1793,12 @@ paths:
           $ref: '#/components/responses/Conflict'
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: bulk
     patch:
       tags:
@@ -1833,12 +1833,12 @@ paths:
           $ref: '#/components/responses/Conflict'
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: bulk
   '/api/v2/search_engines/{hashid}/indices/{name}/items/':
     get:
@@ -1904,12 +1904,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictInactive'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     post:
       tags:
         - Items
@@ -1944,12 +1944,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/Conflict'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: item
   '/api/v2/search_engines/{hashid}/indices/{name}/items/_mget':
     post:
@@ -1987,12 +1987,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictInactive'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}/indices/{name}/items/_count':
     get:
       tags:
@@ -2027,12 +2027,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictInactive'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}/indices/{name}/temp/':
     post:
       tags:
@@ -2068,12 +2068,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictTooManyTemp'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     delete:
       tags:
         - Indices
@@ -2096,12 +2096,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '408':
           $ref: '#/components/responses/Timeout'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}/indices/{name}/_replace_by_temp/':
     post:
       tags:
@@ -2133,12 +2133,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '408':
           $ref: '#/components/responses/Timeout'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}/indices/{name}/_reindex_to_temp/':
     get:
       tags:
@@ -2167,12 +2167,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '408':
           $ref: '#/components/responses/Timeout'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     post:
       tags:
         - Indices
@@ -2207,12 +2207,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictReindexInProgress'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}/indices/{name}':
     get:
       tags:
@@ -2236,12 +2236,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     delete:
       tags:
         - Indices
@@ -2266,12 +2266,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/Conflict'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     patch:
       tags:
         - Indices
@@ -2304,12 +2304,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: index
   '/api/v2/search_engines/{hashid}/indices':
     get:
@@ -2333,12 +2333,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     post:
       tags:
         - Indices
@@ -2372,12 +2372,12 @@ paths:
           $ref: '#/components/responses/Timeout'
         '409':
           $ref: '#/components/responses/ConflictIndexExists'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: index
   '/api/v2/search_engines/{hashid}/_process':
     get:
@@ -2405,12 +2405,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/ConflictInactive'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     post:
       tags:
         - Search Engines
@@ -2463,12 +2463,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
   '/api/v2/search_engines/{hashid}':
     get:
       tags:
@@ -2491,12 +2491,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     delete:
       tags:
         - Search Engines
@@ -2516,12 +2516,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     patch:
       tags:
         - Search Engines
@@ -2562,12 +2562,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: searchengine
   '/api/v2/search_engines':
     get:
@@ -2587,12 +2587,12 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
     post:
       tags:
         - Search Engines
@@ -2638,10 +2638,10 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '424':
-          $ref: '#/components/responses/FailedDependency'
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       x-codegen-request-body-name: searchengine
