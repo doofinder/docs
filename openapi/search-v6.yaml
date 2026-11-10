@@ -1441,9 +1441,16 @@ paths:
         - Session & Events
       summary: Init session
       description: |
-        Starts a session identified by a session_id. The session is used to
-        "group" events. I.e. it groups user interactions during a session.
-        Like clicking some banner images, or completing a checkout.
+        Marks the session as a search session. Call it once per session_id,
+        when the user makes the first search of the session — not on page
+        load.
+
+        Search conversion is measured over sessions with an init: calling it
+        on every page view lowers the conversion rate, and not calling it
+        hides that session's sales from search metrics.
+
+        Use the same session_id in the searches, clicks and checkouts of the
+        session. Repeated inits with the same session_id count once.
       operationId: init_stats
       requestBody:
         content:
