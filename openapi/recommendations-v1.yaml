@@ -30,8 +30,8 @@ info:
 
     ## Caveats
 
-    Some recommendation types can personalize results using `user_id`. If it is not provided, the
-    widget returns its default, non-personalized results.
+    Some recommendation types can personalize results using `product_history`. If it is not
+    provided, the widget returns its default, non-personalized results.
 
     The **Browsing history** recommendation relies entirely on the `product_history` field to know
     what the user has seen. If it is not included in the request, no recommendations will be returned
