@@ -383,6 +383,7 @@ components:
             - magento2
             - opencart
             - oscommerce
+            - plentyone
             - prestashop
             - shoper
             - shopware
@@ -558,6 +559,7 @@ components:
             - ekm
             - file
             - magento2
+            - plentyone
             - shopify
             - shoper
             - shopware
@@ -625,6 +627,19 @@ components:
                     - product
                     - category
                     - page
+            - title: Plentyone Source Options
+              description:
+                Required parameters to access a `plentyone` source.
+              type: object
+              required:
+                - feed_type
+              properties:
+                feed_type:
+                  description:
+                    The type of content being indexed
+                  type: string
+                  enum:
+                    - product
             - title: Shoper Source Options
               description:
                 Required parameters to access a `shoper` source.
